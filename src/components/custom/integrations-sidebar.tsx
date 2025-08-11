@@ -8,7 +8,7 @@ export default function IntegrationsSidebar({ session }: { session: { paragonUse
 	const integrations = paragon?.getIntegrationMetadata() ?? [];
 
 	return (
-		<div className="pt-3 w-72">
+		<div className="pt-18 w-72">
 			<div className="flex items-center justify-between w-full">
 				<h1 className="font-semibold text-sm mt-2 mb-2">Sources</h1>
 			</div>
