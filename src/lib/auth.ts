@@ -1,5 +1,3 @@
-"use server";
-
 import { signOut, withAuth } from "@workos-inc/authkit-nextjs";
 import { SignJWT } from "jose";
 
@@ -33,8 +31,6 @@ export async function userWithToken() {
 	}
 	return { user: null };
 }
-
-//export const auth = userWithToken;
 
 export async function createParagonToken(userId: string) {
 	console.log('token user: ', userId);
