@@ -1,7 +1,7 @@
 import IntegrationsSidebar from "@/components/custom/integrations-sidebar";
 import { userWithToken } from "@/lib/auth";
 import { Navbar } from "@/components/custom/navbar";
-import ActionTester from "@/components/custom/action-tester";
+import ActionTester from "@/components/feature/action-tester";
 
 export default async function Actions() {
   const session = await userWithToken();

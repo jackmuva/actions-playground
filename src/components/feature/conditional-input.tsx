@@ -7,7 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { FieldLabel } from '@/components/custom/form/field-label';
+import { FieldLabel } from '@/components/form/field-label';
 
 type SupportedOperator = string;
 

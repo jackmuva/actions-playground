@@ -6,7 +6,7 @@ import {
 } from '@useparagon/connect';
 import { useState } from 'react';
 
-import { SerializedConnectInputPicker } from '@/components/custom/serialized-connect-input-picker';
+import { SerializedConnectInputPicker } from '@/components/feature/serialized-connect-input-picker';
 import { Button } from '@/components/ui/button';
 
 export function IntegrationSettingsSection(props: { integration: string }) {

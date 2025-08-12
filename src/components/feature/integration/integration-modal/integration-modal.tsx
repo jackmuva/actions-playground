@@ -9,7 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { IntegrationInstallFlowForm } from '../integration-install-flow-form';
+import { IntegrationInstallFlowForm } from '@/components/feature/integration/integration-install-flow-form';
 
 // Removed ActionButton, Workflows, and Settings — we only render when user input is needed
 
@@ -71,7 +71,7 @@ export function IntegrationModal(props: Props) {
       .catch((error) => {
         setInstallationError(
           error?.message ??
-          'Something went wrong while installing the integration'
+            'Something went wrong while installing the integration'
         );
       });
   };

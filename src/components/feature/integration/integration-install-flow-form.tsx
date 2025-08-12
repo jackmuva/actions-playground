@@ -8,7 +8,7 @@ import {
 import { Controller, useForm } from 'react-hook-form';
 
 import { Button } from '@/components/ui/button';
-import { SerializedConnectInputPicker } from '@/components/custom/serialized-connect-input-picker';
+import { SerializedConnectInputPicker } from '@/components/feature/serialized-connect-input-picker';
 
 type InstallFlowStage = ReturnType<typeof paragon.installFlow.next>;
 

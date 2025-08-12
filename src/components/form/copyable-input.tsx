@@ -1,6 +1,6 @@
 import { CopyIcon } from 'lucide-react';
 import { CheckIcon } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '../ui/button';
 import { TextInputField } from './text-input-field';
 import { useCallback, useRef, useState } from 'react';
 
@@ -64,4 +64,4 @@ function useTemporaryState<T>(initialValue: T, duration: number) {
   return [value, setValueWithTimeout] as const;
 }
 
-const noop = () => { };
+const noop = () => {};

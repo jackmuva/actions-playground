@@ -6,11 +6,11 @@ import {
 } from '@useparagon/connect';
 import { useMemo, useState } from 'react';
 
-import { ComboboxField } from '@/components/custom/form/combobox-field';
+import { ComboboxField } from '@/components/form/combobox-field';
 import { useDataSourceOptions, useFieldOptions } from '@/lib/hooks';
 import { Label } from '../ui/label';
 import { CommandGroup } from '../ui/command';
-import { FieldLabel } from './form/field-label';
+import { FieldLabel } from '../form/field-label';
 
 export type FieldMappingsInputValue = {
   mainInput: string | undefined;
@@ -191,28 +191,28 @@ export function FieldMapperField(props: Props) {
             })}
           {mainInputOptions.nestedData
             ? mainInputOptions.nestedData.map((category) => {
-              return (
-                <CommandGroup key={category.title} heading={category.title}>
-                  {category.items.map((option) => {
-                    return (
-                      <ComboboxField.Item
-                        key={option.value}
-                        value={option.value}
-                      >
-                        {option.label}
-                      </ComboboxField.Item>
-                    );
-                  })}
-                </CommandGroup>
-              );
-            })
+                return (
+                  <CommandGroup key={category.title} heading={category.title}>
+                    {category.items.map((option) => {
+                      return (
+                        <ComboboxField.Item
+                          key={option.value}
+                          value={option.value}
+                        >
+                          {option.label}
+                        </ComboboxField.Item>
+                      );
+                    })}
+                  </CommandGroup>
+                );
+              })
             : mainInputOptions.data.map((option) => {
-              return (
-                <ComboboxField.Item key={option.value} value={option.value}>
-                  {option.label}
-                </ComboboxField.Item>
-              );
-            })}
+                return (
+                  <ComboboxField.Item key={option.value} value={option.value}>
+                    {option.label}
+                  </ComboboxField.Item>
+                );
+              })}
         </ComboboxField>
         {dependentInputMeta && (
           <ComboboxField

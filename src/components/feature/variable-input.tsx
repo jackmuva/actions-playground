@@ -1,8 +1,8 @@
 import { useFieldOptions } from '@/lib/hooks';
-import { SelectField } from './form/select-field';
-import { MultiSelectField } from './form/multi-select-field';
-import { TextInputField } from './form/text-input-field';
-import { ComboboxField } from '@/components/custom/form/combobox-field';
+import { SelectField } from '../form/select-field';
+import { MultiSelectField } from '../form/multi-select-field';
+import { TextInputField } from '../form/text-input-field';
+import { ComboboxField } from '@/components/form/combobox-field';
 import { LoaderCircle, MinusCircleIcon } from 'lucide-react';
 import { DynamicDefaultInput } from '@useparagon/connect';
 import { Button } from '../ui/button';
