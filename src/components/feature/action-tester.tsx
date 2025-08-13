@@ -17,7 +17,7 @@ import inputsMapping from '@/lib/inputsMapping.json';
 import useParagon from '@/lib/hooks';
 
 const IntegrationTitle = ({ integration }: { integration: string | null }) => {
-  const { data: integrations } = useIntegrationMetadata();
+  const integrations = paragon.getIntegrationMetadata();
 
   const integrationMetadata = integrations?.find((i) => i.type === integration);
   if (!integrationMetadata) {
@@ -46,11 +46,11 @@ type ParagonAction = {
 export default function ActionTester({ session }: { session: { paragonUserToken?: string } }) {
   useParagon(session.paragonUserToken ?? "");
   const [integration, setIntegration] = useState<string | null>(null);
-  const { data: user, refetch: refetchUser } = useAuthenticatedUser();
-  const { data: integrations, isLoading: isLoadingIntegrations } =
-    useIntegrationMetadata();
+  const user = paragon.getUser();
+  const integrations = paragon.getIntegrationMetadata();
   const integrationMetadata = integrations?.find((i) => i.type === integration);
   const [integrationQuery, setIntegrationQuery] = useState('');
+  console.log(integration);
 
 
   const actions = useQuery<ParagonAction[]>({
@@ -63,7 +63,7 @@ export default function ActionTester({ session }: { session: { paragonUserToken?
         `https://actionkit.useparagon.com/projects/${process.env.NEXT_PUBLIC_PARAGON_PROJECT_ID}/actions?integrations=${integration}&format=paragon`,
         {
           headers: {
-            Authorization: `Bearer ${process.env.NEXT_PUBLIC_PARAGON_JWT_TOKEN}`,
+            Authorization: `Bearer ${session.paragonUserToken}`,
           },
         },
       );
@@ -137,7 +137,7 @@ export default function ActionTester({ session }: { session: { paragonUserToken?
         {
           method: 'POST',
           headers: {
-            Authorization: `Bearer ${process.env.NEXT_PUBLIC_PARAGON_JWT_TOKEN}`,
+            Authorization: `Bearer ${session.paragonUserToken}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
@@ -157,7 +157,7 @@ export default function ActionTester({ session }: { session: { paragonUserToken?
 
   const [isDisconnecting, setIsDisconnecting] = useState(false);
 
-  if (!user || isLoadingIntegrations || !integrations) {
+  if (!user || !integrations) {
     return <div>Loading...</div>;
   }
 
@@ -341,13 +341,11 @@ export default function ActionTester({ session }: { session: { paragonUserToken?
             icon={integrationMetadata?.icon ?? ''}
             status={undefined}
             onInstall={() => {
-              refetchUser().then(() => {
-                actions.refetch();
-              });
+              actions.refetch();
               setIsModalOpen(false);
             }}
             onUninstall={() => {
-              refetchUser();
+              paragon.uninstallIntegration(integration);
             }}
           />
         )}

@@ -1,5 +1,6 @@
 import { ChevronDownIcon } from "lucide-react";
 import { useState } from "react";
+import { Button } from "../ui/button";
 
 type IntegrationTileProps = {
 	integration: {
@@ -64,14 +65,12 @@ export function IntegrationTile({
 					</div>
 				</div>
 				{expanded ? (
-					<div className="border-slate-300 dark:border-slate-700 border-t p-4 pt-2">
+					<div className="border-slate-300 dark:border-slate-700 p-4 pt-2">
 						<div className="flex flex-col space-y-2 items-start">
-							<button
-								className="w-fit text-sm rounded-md px-2 py-1 border border-slate-300 dark:border-slate-700 cursor-pointer hover:bg-muted"
-								onClick={() => onConnect()}
+							<Button variant={"outline"} onClick={() => onConnect()}
 							>
 								Configure
-							</button>
+							</Button>
 						</div>
 					</div>
 				) : null}
