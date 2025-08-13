@@ -14,6 +14,7 @@ import { IntegrationModal } from './integration/integration-modal/integration-mo
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { SerializedConnectInputPicker } from './serialized-connect-input-picker';
 import inputsMapping from '@/lib/inputsMapping.json';
+import useParagon from '@/lib/hooks';
 
 const IntegrationTitle = ({ integration }: { integration: string | null }) => {
   const { data: integrations } = useIntegrationMetadata();
@@ -42,7 +43,8 @@ type ParagonAction = {
   inputs?: SerializedConnectInput[];
 };
 
-export default function ActionTester() {
+export default function ActionTester({ session }: { session: { paragonUserToken?: string } }) {
+  useParagon(session.paragonUserToken ?? "");
   const [integration, setIntegration] = useState<string | null>(null);
   const { data: user, refetch: refetchUser } = useAuthenticatedUser();
   const { data: integrations, isLoading: isLoadingIntegrations } =

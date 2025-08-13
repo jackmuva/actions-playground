@@ -153,7 +153,7 @@ export function ComboboxField({ size, className, ...props }: Props) {
               <CommandInput
                 placeholder="Search"
                 onValueChange={handleDebouncedChange}
-                leadingIcon={props.isFetching ? <Spinner /> : null}
+              //leadingIcon={props.isFetching ? <Spinner /> : null}
               />
               <CommandList>
                 <CommandEmpty>
