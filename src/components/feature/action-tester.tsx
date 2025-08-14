@@ -280,11 +280,11 @@ export default function ActionTester({ session }: { session: { paragonUserToken?
           <div>
             <Button
               className="bg-indigo-500 hover:bg-indigo-600 text-white"
-              disabled={!selectedAction || runAction.isLoading}
+              disabled={!selectedAction || runAction.isPending}
               onClick={() => runAction.mutate()}
             >
               <Play className="size-3 mr-1 fill-white" /> Run Action{' '}
-              {runAction.isLoading && (
+              {runAction.isPending && (
                 <Loader2 className="size-4 animate-spin" />
               )}
             </Button>
@@ -299,13 +299,13 @@ export default function ActionTester({ session }: { session: { paragonUserToken?
             {runAction.isError && (
               <XCircle className="size-5 fill-red-500 text-white" />
             )}
-            {runAction.isLoading && <Loader2 className="size-4 animate-spin" />}
+            {runAction.isPending && <Loader2 className="size-4 animate-spin" />}
             <p className="text-sm font-semibold text-neutral-600 dark:text-neutral-500">
               {runAction.isSuccess
                 ? 'Success'
                 : runAction.isError
                   ? 'Error'
-                  : runAction.isLoading
+                  : runAction.isPending
                     ? 'Running...'
                     : ''}
             </p>
@@ -324,7 +324,7 @@ export default function ActionTester({ session }: { session: { paragonUserToken?
         ) : (
           <div className="flex flex-col gap-2 border border-neutral-200 dark:border-neutral-800 rounded-md p-4">
             <p className="text-center text-neutral-500 dark:text-neutral-400 text-sm">
-              {runAction.isLoading
+              {runAction.isPending
                 ? 'Running...'
                 : 'Run an Action to see the output here.'}
             </p>
