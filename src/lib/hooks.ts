@@ -37,14 +37,14 @@ export default function useParagon(paragonUserToken: string) {
 
   // Listen for account state changes
   useEffect(() => {
-    // @ts-ignore
+    // @ts-expect-error event type
     paragonConnect.subscribe("onIntegrationInstall", updateUser);
-    // @ts-ignore
+    // @ts-expect-error event type
     paragonConnect.subscribe("onIntegrationUninstall", updateUser);
     return () => {
-      // @ts-ignore
+      // @ts-expect-error event type
       paragonConnect.unsubscribe("onIntegrationInstall", updateUser);
-      // @ts-ignore
+      // @ts-expect-error event type
       paragonConnect.unsubscribe("onIntegrationUninstall", updateUser);
     };
   }, []);

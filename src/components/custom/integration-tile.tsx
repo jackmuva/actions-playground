@@ -34,7 +34,7 @@ export function IntegrationTile({
           hover:bg-gray-100 dark:hover:bg-secondary cursor-pointer"
 					onClick={handleClick}>
 					<div className="flex items-center">
-						<img src={integration.icon} className="w-4 h-4 mr-2" />
+						<img alt="integration icon" src={integration.icon} className="w-4 h-4 mr-2" />
 						<p className="text-sm font-semibold">{integration.name}</p>
 					</div>
 					<div className="flex items-center">

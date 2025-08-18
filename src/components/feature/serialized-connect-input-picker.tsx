@@ -221,7 +221,7 @@ export function SerializedConnectInputPicker(props: Props) {
       <ConditionalInputField
         field={f}
         required={required}
-        value={value as unknown as any}
+        value={value as any}
         onChange={(v) => onChange(v as unknown as ConnectInputValue)}
       />
     );

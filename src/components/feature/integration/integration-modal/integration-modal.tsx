@@ -71,7 +71,7 @@ export function IntegrationModal(props: Props) {
       .catch((error) => {
         setInstallationError(
           error?.message ??
-            'Something went wrong while installing the integration'
+          'Something went wrong while installing the integration'
         );
       });
   };
@@ -102,7 +102,7 @@ export function IntegrationModal(props: Props) {
       <DialogContent className="w-[90dvw] max-w-[800px] max-h-[90dvh]">
         <DialogHeader>
           <div className="flex gap-4 items-center">
-            <img src={props.icon} width={32} />
+            <img alt="integration icon" src={props.icon} width={32} />
             <DialogTitle>Connect {props.name}</DialogTitle>
           </div>
         </DialogHeader>

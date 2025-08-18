@@ -30,7 +30,7 @@ export function IntegrationCard(props: Props) {
         <CardTitle>
           <div className="flex gap-2 items-center justify-between">
             <div className="flex gap-2 items-center">
-              <img src={props.icon} width={30} />
+              <img alt='integration icon' src={props.icon} width={30} />
               {props.name}
             </div>
             <div className="flex gap-2 items-center">

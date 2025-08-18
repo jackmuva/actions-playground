@@ -1,12 +1,9 @@
 "use client";
 import { useEffect, useMemo, useState } from 'react';
 import { ComboboxField } from '../form/combobox-field';
-import { useAuthenticatedUser, useIntegrationMetadata } from '@/lib/hooks';
 import { Button } from '../ui/button';
 import { Check, Loader2, Play, XCircle } from 'lucide-react';
 import {
-  AuthenticatedConnectUser,
-  ConnectUser,
   paragon,
   SidebarInputType,
   type ConnectInputValue,
