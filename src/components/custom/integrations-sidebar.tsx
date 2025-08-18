@@ -9,9 +9,9 @@ export default function IntegrationsSidebar({ session }: { session: { paragonUse
 	const integrations = paragonConnect?.getIntegrationMetadata() ?? [];
 
 	return (
-		<div className="w-72">
+		<div className="w-96 mr-2">
 			<div className="flex items-center justify-between w-full">
-				<h1 className="font-semibold text-sm mt-2 mb-2">Sources</h1>
+				<h1 className="font-semibold mb-4">Sources</h1>
 			</div>
 			<div className="flex flex-wrap">
 				{user?.authenticated ? (

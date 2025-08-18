@@ -11,7 +11,7 @@ export default async function Welcome() {
   }
 
   return (
-    <div className="min-h-dvh w-dvw flex flex-col items-center pt-40 space-y-6">
+    <div className="min-h-dvh w-dvw flex flex-col items-center pt-40 space-y-6 bg-radial">
       <h1 className="font-bold text-5xl">
         ActionKit Playground
       </h1>

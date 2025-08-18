@@ -28,7 +28,7 @@ export function Navbar() {
 					Actionkit Playground
 				</h1>
 			</div>
-			<div className="flex items-center space-x-1 border-2 rounded-sm py-1 px-2 cursor-pointer static"
+			<div className="flex items-center space-x-1 border-2 rounded-sm py-1 px-4 cursor-pointer"
 				onClick={toggleLogout}>
 				<User size={20} />
 				<div>

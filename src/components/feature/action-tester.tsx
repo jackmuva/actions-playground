@@ -5,6 +5,8 @@ import { useAuthenticatedUser, useIntegrationMetadata } from '@/lib/hooks';
 import { Button } from '../ui/button';
 import { Check, Loader2, Play, XCircle } from 'lucide-react';
 import {
+  AuthenticatedConnectUser,
+  ConnectUser,
   paragon,
   SidebarInputType,
   type ConnectInputValue,
@@ -50,8 +52,6 @@ export default function ActionTester({ session }: { session: { paragonUserToken?
   const integrations = paragon.getIntegrationMetadata();
   const integrationMetadata = integrations?.find((i) => i.type === integration);
   const [integrationQuery, setIntegrationQuery] = useState('');
-  console.log(integration);
-
 
   const actions = useQuery<ParagonAction[]>({
     queryKey: ['actions', integration],
@@ -162,11 +162,11 @@ export default function ActionTester({ session }: { session: { paragonUserToken?
   }
 
   return (
-    <div className="flex gap-4 h-min-screen relative">
-      <div className="flex-1 border border-neutral-200 dark:border-neutral-800 rounded-md p-8">
-        <h1 className="text-xl font-bold mb-4">Actions</h1>
-        <div className="flex flex-col gap-6">
-          <div className="flex flex-col gap-2">
+    <div className="flex gap-4 h-full relative w-full max-h-[calc(100dvh-10rem)]">
+      <div className="flex-1 w-1/2">
+        <h1 className="font-bold mb-4">Actions</h1>
+        <div className="flex flex-col gap-6 overflow-x-scroll max-h-full border border-neutral-200 rounded-md p-2">
+          <div className="flex flex-col gap-2 ">
             <ComboboxField
               id="integration"
               title="Integration"
@@ -291,16 +291,16 @@ export default function ActionTester({ session }: { session: { paragonUserToken?
           </div>
         </div>
       </div>
-      <div className="w-[40%] max-h-[calc(100dvh-10rem)] border border-neutral-200 dark:border-neutral-800 rounded-md p-8 px-6 sticky top-22">
+      <div className="w-1/2">
         <div className="flex justify-between items-center mb-4">
-          <h1 className="text-xl font-bold">Output</h1>
+          <h1 className="font-bold">Output</h1>
           <div className="flex gap-2 items-center">
             {runAction.isSuccess && <Check className="size-5 text-green-600" />}
             {runAction.isError && (
               <XCircle className="size-5 fill-red-500 text-white" />
             )}
             {runAction.isPending && <Loader2 className="size-4 animate-spin" />}
-            <p className="text-sm font-semibold text-neutral-600 dark:text-neutral-500">
+            <p className="text-sm font-semibold text-neutral-600">
               {runAction.isSuccess
                 ? 'Success'
                 : runAction.isError
@@ -312,8 +312,8 @@ export default function ActionTester({ session }: { session: { paragonUserToken?
           </div>
         </div>
         {runAction.data || runAction.error ? (
-          <div className="flex flex-col gap-2 h-full pb-4">
-            <pre className="text-xs p-2 bg-neutral-100 dark:bg-neutral-900 rounded-md overflow-x-scroll">
+          <div className="flex flex-col gap-2 h-full">
+            <pre className="text-xs p-2 bg-neutral-100 rounded-md overflow-x-scroll">
               {runAction.data
                 ? JSON.stringify(runAction.data, null, 2)
                 : runAction.error
@@ -322,7 +322,7 @@ export default function ActionTester({ session }: { session: { paragonUserToken?
             </pre>
           </div>
         ) : (
-          <div className="flex flex-col gap-2 border border-neutral-200 dark:border-neutral-800 rounded-md p-4">
+          <div className="flex flex-col gap-2 border border-neutral-200 rounded-md p-4">
             <p className="text-center text-neutral-500 dark:text-neutral-400 text-sm">
               {runAction.isPending
                 ? 'Running...'
