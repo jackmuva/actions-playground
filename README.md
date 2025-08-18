@@ -15,8 +15,10 @@ bun dev
 ```
 
 ## Todos
-- implement sidebar
-- implement dropdown action tester
 - auth flow
     - create dummy sidebar and actions for unauthed users
     - auth when dummy actions
+- pick apps with lenient dev credentials
+- confirm correct scopes
+- workos webhook workflow
+    - signups vs logins
