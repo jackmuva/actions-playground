@@ -1,6 +1,6 @@
 import { SidebarInputType } from '@useparagon/connect';
 
-import { SelectField } from '@/components/custom/form/select-field';
+import { SelectField } from '@/components/form/select-field';
 
 type EnumOption = { value: string; label: string };
 

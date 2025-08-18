@@ -9,7 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { IntegrationInstallFlowForm } from '../integration-install-flow-form';
+import { IntegrationInstallFlowForm } from '@/components/feature/integration/integration-install-flow-form';
 
 // Removed ActionButton, Workflows, and Settings — we only render when user input is needed
 
@@ -102,7 +102,7 @@ export function IntegrationModal(props: Props) {
       <DialogContent className="w-[90dvw] max-w-[800px] max-h-[90dvh]">
         <DialogHeader>
           <div className="flex gap-4 items-center">
-            <img src={props.icon} width={32} />
+            <img alt="integration icon" src={props.icon} width={32} />
             <DialogTitle>Connect {props.name}</DialogTitle>
           </div>
         </DialogHeader>

@@ -1,16 +1,17 @@
 "use client";
 
-import useParagon from "@/lib/useParagon";
 import { IntegrationTile } from "./integration-tile";
+import useParagon from "@/lib/hooks";
+
 
 export default function IntegrationsSidebar({ session }: { session: { paragonUserToken?: string } }) {
-	const { user, paragon, } = useParagon(session.paragonUserToken ?? "");
-	const integrations = paragon?.getIntegrationMetadata() ?? [];
+	const { user, paragonConnect, } = useParagon(session.paragonUserToken ?? "");
+	const integrations = paragonConnect?.getIntegrationMetadata() ?? [];
 
 	return (
-		<div className="pt-18 w-72">
+		<div className="w-96 mr-2">
 			<div className="flex items-center justify-between w-full">
-				<h1 className="font-semibold text-sm mt-2 mb-2">Sources</h1>
+				<h1 className="font-semibold mb-4">Sources</h1>
 			</div>
 			<div className="flex flex-wrap">
 				{user?.authenticated ? (
@@ -33,7 +34,7 @@ export default function IntegrationsSidebar({ session }: { session: { paragonUse
 						.map((integration) => (
 							<IntegrationTile
 								integration={integration}
-								onConnect={() => paragon!.connect(integration.type, {})}
+								onConnect={() => paragonConnect!.connect(integration.type, {})}
 								integrationEnabled={
 									user?.authenticated &&
 									user?.integrations?.[integration.type]?.enabled

@@ -4,7 +4,7 @@ import {
 } from '@useparagon/connect';
 import { useMemo, useState } from 'react';
 
-import { ComboboxField } from '@/components/custom/form/combobox-field';
+import { ComboboxField } from '@/components/form/combobox-field';
 import { useFieldOptions } from '@/lib/hooks';
 
 type Props = {

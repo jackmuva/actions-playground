@@ -3,15 +3,15 @@ import {
   type ConnectInputValue,
   type SerializedConnectInput,
 } from '@useparagon/connect';
-import { TextInputField } from './form/text-input-field';
-import { BooleanField } from './form/boolean-field';
-import { SelectField } from './form/select-field';
+import { TextInputField } from '../form/text-input-field';
+import { BooleanField } from '../form/boolean-field';
+import { SelectField } from '../form/select-field';
 import { DynamicEnumField } from './dynamic-enum';
 import { ComboInputField, ComboInputValue } from './combo-input';
 import { FieldMapperField, FieldMappingsInputValue } from './field-mapper';
-import { CopyableInput } from './form/copyable-input';
+import { CopyableInput } from '../form/copyable-input';
 import { DynamicComboInputField } from './dynamic-combo-input';
-import { CodeInputField } from './form/code-input-field';
+import { CodeInputField } from '../form/code-input-field';
 import { StaticEnumField } from './static-enum';
 import { ConditionalInputField } from './conditional-input';
 
@@ -221,7 +221,7 @@ export function SerializedConnectInputPicker(props: Props) {
       <ConditionalInputField
         field={f}
         required={required}
-        value={value as unknown as any}
+        value={value as any}
         onChange={(v) => onChange(v as unknown as ConnectInputValue)}
       />
     );

@@ -43,6 +43,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-radial: radial-gradient(circle 1000px at 50% 120%,rgba(153, 226, 255, 1) 0%, rgba(240, 222, 255, 1) 50%, rgba(255, 252, 245, 1) 100%);
   --color-background-muted: var(--background-muted);
   --color-foreground-muted: var(--foreground-muted);
   --font-sans: var(--font-geist-sans);
@@ -80,10 +81,6 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
-}
-
-body {
-  background: radial-gradient(circle 1000px at 50% 120%,rgba(153, 226, 255, 1) 0%, rgba(240, 222, 255, 1) 50%, rgba(255, 252, 245, 1) 100%);
 }
 
 .dark {
@@ -127,4 +124,8 @@ body {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+.bg-radial {
+  background: var(--color-radial) !important;
 }
