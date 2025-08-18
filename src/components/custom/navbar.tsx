@@ -28,17 +28,35 @@ export function Navbar() {
 					Actionkit Playground
 				</h1>
 			</div>
-			<div className="flex items-center space-x-1 border-2 rounded-sm py-1 px-4 cursor-pointer"
-				onClick={toggleLogout}>
-				<User size={20} />
-				<div>
-					{user?.user?.firstName}
+			<div className="relative">
+				<div className="flex items-center space-x-2 border-2 rounded-sm py-1 px-4 cursor-pointer hover:bg-gray-50 transition-colors"
+					onClick={toggleLogout}>
+					<User size={20} />
+					<div>
+						{user?.user?.firstName}
+					</div>
 				</div>
-				{logoutPanel && <div className="absolute -bottom-6 right-4">
-					<Button variant={"outline"} onClick={() => signOut()}>
-						Sign out
-					</Button>
-				</div>}
+				{logoutPanel && (
+					<div className="absolute top-full right-0 mt-1 w-48 bg-white border border-neutral-100 rounded-md shadow-lg py-2 z-50">
+						<div className="px-4 py-2 border-b border-neutral-100">
+							<div className="text-sm">
+								{user?.user?.firstName} {user?.user?.lastName}
+							</div>
+							<div className="text-sm overflow-hidden text-ellipsis whitespace-nowrap">
+								{user?.user?.email}
+							</div>
+						</div>
+						<div className="px-2 py-1">
+							<Button 
+								variant="ghost" 
+								onClick={() => signOut()}
+								className="w-full justify-start hover:text-gray-900 hover:bg-gray-100"
+							>
+								Sign out
+							</Button>
+						</div>
+					</div>
+				)}
 			</div>
 		</div>
 	)
