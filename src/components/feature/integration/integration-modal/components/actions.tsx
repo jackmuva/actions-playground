@@ -10,7 +10,8 @@ export default function ActionsSection({ integration }: ActionsSectionProps) {
     queryFn: async () => {
       const response = await fetch(`https://actionkit.useparagon.com/projects/${process.env.NEXT_PUBLIC_PARAGON_PROJECT_ID}/actions?integrations=${integration}&format=paragon`, {
         headers: {
-          'Authorization': `Bearer ${config.VITE_PARAGON_JWT_TOKEN}`
+          //NOTE: i don't think this component is used anywhere
+          'Authorization': `Bearer ${"placeholder"}`
         }
       });
       const data = await response.json();

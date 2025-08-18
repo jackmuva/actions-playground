@@ -53,6 +53,7 @@ export default function ActionTester({ session }: { session: { paragonUserToken?
   const actions = useQuery<ParagonAction[]>({
     queryKey: ['actions', integration],
     queryFn: async () => {
+      //@ts-expect-error is type Authenticated Connected User
       if (!integration || !user?.integrations[integration]?.enabled) {
         return [] as ParagonAction[];
       }
@@ -196,43 +197,44 @@ export default function ActionTester({ session }: { session: { paragonUserToken?
             </ComboboxField>
             {integration && (
               <div>
-                {user.integrations[integration]?.enabled ? (
-                  <div className="flex gap-2 items-center">
-                    <Check className="h-4 w-4 text-green-500" />
-                    <p className="text-sm text-neutral-500 dark:text-neutral-400">
-                      Connected
-                    </p>
-                    <Button
-                      variant="ghost"
-                      className="text-red-500 hover:text-red-600 hover:bg-red-500/10"
-                      onClick={() => {
-                        paragon.uninstallIntegration(integration).then(() => {
-                          refetchUser();
-                          setIsDisconnecting(false);
-                        });
-                        setIsDisconnecting(true);
-                      }}
-                    >
-                      Disconnect account{' '}
-                      {isDisconnecting && (
-                        <Loader2 className="size-4 animate-spin" />
-                      )}
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="flex gap-4 items-center mt-2">
-                    <Button
-                      size="sm"
-                      className="bg-indigo-500 hover:bg-indigo-600 text-white"
-                      onClick={() => setIsModalOpen(true)}
-                    >
-                      Connect to {integrationMetadata?.name}
-                    </Button>
-                    <p className="text-sm text-neutral-500 dark:text-neutral-400">
-                      Connect an account to test Actions.
-                    </p>
-                  </div>
-                )}
+                {
+                  //@ts-expect-error is type Authenticated Connected User
+                  user.integrations[integration]?.enabled ? (
+                    <div className="flex gap-2 items-center">
+                      <Check className="h-4 w-4 text-green-500" />
+                      <p className="text-sm text-neutral-500 dark:text-neutral-400">
+                        Connected
+                      </p>
+                      <Button
+                        variant="ghost"
+                        className="text-red-500 hover:text-red-600 hover:bg-red-500/10"
+                        onClick={() => {
+                          paragon.uninstallIntegration(integration).then(() => {
+                            setIsDisconnecting(false);
+                          });
+                          setIsDisconnecting(true);
+                        }}
+                      >
+                        Disconnect account{' '}
+                        {isDisconnecting && (
+                          <Loader2 className="size-4 animate-spin" />
+                        )}
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="flex gap-4 items-center mt-2">
+                      <Button
+                        size="sm"
+                        className="bg-indigo-500 hover:bg-indigo-600 text-white"
+                        onClick={() => setIsModalOpen(true)}
+                      >
+                        Connect to {integrationMetadata?.name}
+                      </Button>
+                      <p className="text-sm text-neutral-500 dark:text-neutral-400">
+                        Connect an account to test Actions.
+                      </p>
+                    </div>
+                  )}
               </div>
             )}
           </div>
@@ -244,6 +246,7 @@ export default function ActionTester({ session }: { session: { paragonUserToken?
             allowClear
             required
             isFetching={actions.isLoading}
+            //@ts-expect-error is type Authenticated Connected User
             disabled={!integration || !user.integrations[integration]?.enabled}
             onSelect={(value) => setAction(value ?? null)}
             onOpenChange={(open) => {
@@ -330,6 +333,7 @@ export default function ActionTester({ session }: { session: { paragonUserToken?
       </div>
       {isModalOpen &&
         integration &&
+        //@ts-expect-error is type Authenticated Connected User
         !user.integrations[integration]?.enabled && (
           <IntegrationModal
             onOpenChange={setIsModalOpen}
