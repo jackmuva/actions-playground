@@ -2,7 +2,8 @@
 
 ## Getting Started
 
-First, run the development server:
+- copy .env.example to .env and fill out env vars
+- run the development server:
 
 ```bash
 npm run dev
@@ -20,5 +21,4 @@ bun dev
     - auth when dummy actions
 - pick apps with lenient dev credentials
 - confirm correct scopes
-- workos webhook workflow
-    - signups vs logins
+- send new signups to webhook url
