@@ -48,7 +48,6 @@ export default function ActionTester({ session }: { session: { paragonUserToken?
   const integrations = paragonConnect?.getIntegrationMetadata();
   const integrationMetadata = integrations?.find((i) => i.type === integration);
   const [integrationQuery, setIntegrationQuery] = useState('');
-  console.log(integration);
 
   const actions = useQuery<ParagonAction[]>({
     queryKey: ['actions', integration],
