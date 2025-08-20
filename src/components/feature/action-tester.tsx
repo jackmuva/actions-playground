@@ -9,7 +9,6 @@ import {
   type ConnectInputValue,
   type SerializedConnectInput,
 } from '@useparagon/connect';
-import { IntegrationModal } from './integration/integration-modal/integration-modal';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { SerializedConnectInputPicker } from './serialized-connect-input-picker';
 import inputsMapping from '@/lib/inputsMapping.json';
@@ -43,12 +42,13 @@ type ParagonAction = {
 };
 
 export default function ActionTester({ session }: { session: { paragonUserToken?: string } }) {
-  useParagon(session.paragonUserToken ?? "");
+  const { paragonConnect } = useParagon(session.paragonUserToken ?? "");
   const [integration, setIntegration] = useState<string | null>(null);
-  const user = paragon.getUser();
-  const integrations = paragon.getIntegrationMetadata();
+  const user = paragonConnect?.getUser();
+  const integrations = paragonConnect?.getIntegrationMetadata();
   const integrationMetadata = integrations?.find((i) => i.type === integration);
   const [integrationQuery, setIntegrationQuery] = useState('');
+  console.log(integration);
 
   const actions = useQuery<ParagonAction[]>({
     queryKey: ['actions', integration],
@@ -74,8 +74,6 @@ export default function ActionTester({ session }: { session: { paragonUserToken?
     Record<string, ConnectInputValue>
   >({});
   const [actionQuery, setActionQuery] = useState('');
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const selectedAction: ParagonAction | null = useMemo(() => {
     return actions.data?.find((a) => a.name === action) ?? null;
@@ -120,10 +118,6 @@ export default function ActionTester({ session }: { session: { paragonUserToken?
     }
     setInputValues(initial);
   }, [selectedAction]);
-
-  useEffect(() => {
-    setIsModalOpen(false);
-  }, [integration]);
 
   const runAction = useMutation({
     mutationFn: async () => {
@@ -209,7 +203,7 @@ export default function ActionTester({ session }: { session: { paragonUserToken?
                         variant="ghost"
                         className="text-red-500 hover:text-red-600 hover:bg-red-500/10"
                         onClick={() => {
-                          paragon.uninstallIntegration(integration).then(() => {
+                          paragonConnect?.uninstallIntegration(integration).then(() => {
                             setIsDisconnecting(false);
                           });
                           setIsDisconnecting(true);
@@ -226,7 +220,9 @@ export default function ActionTester({ session }: { session: { paragonUserToken?
                       <Button
                         size="sm"
                         className="bg-indigo-500 hover:bg-indigo-600 text-white"
-                        onClick={() => setIsModalOpen(true)}
+                        onClick={() => {
+                          paragonConnect?.connect(integration, {})
+                        }}
                       >
                         Connect to {integrationMetadata?.name}
                       </Button>
@@ -331,25 +327,6 @@ export default function ActionTester({ session }: { session: { paragonUserToken?
           </div>
         )}
       </div>
-      {isModalOpen &&
-        integration &&
-        //@ts-expect-error is type Authenticated Connected User
-        !user.integrations[integration]?.enabled && (
-          <IntegrationModal
-            onOpenChange={setIsModalOpen}
-            integration={integration!}
-            name={integrationMetadata?.name ?? ''}
-            icon={integrationMetadata?.icon ?? ''}
-            status={undefined}
-            onInstall={() => {
-              actions.refetch();
-              setIsModalOpen(false);
-            }}
-            onUninstall={() => {
-              paragon.uninstallIntegration(integration);
-            }}
-          />
-        )}
     </div>
   );
 }
