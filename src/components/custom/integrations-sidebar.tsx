@@ -1,12 +1,11 @@
 "use client";
-
 import { IntegrationTile } from "./integration-tile";
 import useParagon from "@/lib/hooks";
 
-
 export default function IntegrationsSidebar({ session }: { session: { paragonUserToken?: string } }) {
-	const { user, paragonConnect, } = useParagon(session.paragonUserToken ?? "");
-	const integrations = paragonConnect?.getIntegrationMetadata() ?? [];
+	const { paragon, user } = useParagon();
+	const integrations = paragon.getIntegrationMetadata() ?? [];
+	console.log(paragon.getUser());
 
 	return (
 		<div className="w-96 mr-2">
@@ -34,7 +33,7 @@ export default function IntegrationsSidebar({ session }: { session: { paragonUse
 						.map((integration) => (
 							<IntegrationTile
 								integration={integration}
-								onConnect={() => paragonConnect!.connect(integration.type, {})}
+								onConnect={() => paragon.connect(integration.type, {})}
 								integrationEnabled={
 									user?.authenticated &&
 									user?.integrations?.[integration.type]?.enabled

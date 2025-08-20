@@ -67,8 +67,7 @@ export function IntegrationTile({
 				{expanded ? (
 					<div className="border-slate-300 dark:border-slate-700 p-4 pt-2">
 						<div className="flex flex-col space-y-2 items-start">
-							<Button variant={"outline"} onClick={() => onConnect()}
-							>
+							<Button variant={"outline"} onClick={() => onConnect()} >
 								Configure
 							</Button>
 						</div>

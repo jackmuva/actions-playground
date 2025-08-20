@@ -43,7 +43,7 @@ type ParagonAction = {
 };
 
 export default function ActionTester({ session }: { session: { paragonUserToken?: string } }) {
-  useParagon(session.paragonUserToken ?? "");
+  useParagon();
   const [integration, setIntegration] = useState<string | null>(null);
   const user = paragon.getUser();
   const integrations = paragon.getIntegrationMetadata();

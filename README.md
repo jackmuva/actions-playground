@@ -22,3 +22,7 @@ bun dev
 - pick apps with lenient dev credentials
 - confirm correct scopes
 - send new signups to webhook url
+- styling
+    - outputs can make widths weird
+    - different connect portals
+- tanstack react query isn't perfect

@@ -1,79 +1,17 @@
+"use client";
 import { useQuery } from '@tanstack/react-query';
 import { paragon } from '@useparagon/connect';
-import ConnectSDK from "@useparagon/connect/ConnectSDK";
-import { useCallback, useEffect, useState } from "react";
+import { useContext } from 'react';
+import { ParagonContext } from './providers';
 
-declare global {
-  interface Window {
-    paragon: typeof paragon;
+export default function useParagon() {
+  const context = useContext(ParagonContext);
+  if (context === undefined) {
+    throw new Error('useParagon must be used within a ParagonProvider');
   }
+  return context;
 }
 
-let paragonConnect: ConnectSDK | undefined;
-export default function useParagon(paragonUserToken: string) {
-  useEffect(() => {
-    if (typeof window !== "undefined" && typeof paragonConnect === "undefined") {
-      paragonConnect = new ConnectSDK();
-    }
-
-    if (!window.paragon) {
-      window.paragon = paragon;
-      paragon.setHeadless(true);
-    }
-  }, []);
-
-  const [user, setUser] = useState(paragonConnect ? paragonConnect.getUser() : null);
-  const [error, setError] = useState();
-
-  const updateUser = useCallback(async () => {
-    if (!paragonConnect) {
-      return;
-    }
-    const authedUser = paragonConnect.getUser();
-    if (authedUser.authenticated) {
-      setUser({ ...authedUser });
-    }
-  }, []);
-
-  // Listen for account state changes
-  useEffect(() => {
-    // @ts-expect-error event type
-    paragonConnect.subscribe("onIntegrationInstall", updateUser);
-    // @ts-expect-error event type
-    paragonConnect.subscribe("onIntegrationUninstall", updateUser);
-    return () => {
-      // @ts-expect-error event type
-      paragonConnect.unsubscribe("onIntegrationInstall", updateUser);
-      // @ts-expect-error event type
-      paragonConnect.unsubscribe("onIntegrationUninstall", updateUser);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!error) {
-      paragon.authenticate(
-        process.env.NEXT_PUBLIC_PARAGON_PROJECT_ID!,
-        paragonUserToken
-      ).then(() => {
-        if (paragonConnect) {
-          paragonConnect.authenticate(
-            process.env.NEXT_PUBLIC_PARAGON_PROJECT_ID!,
-            paragonUserToken
-          )
-            .then(updateUser)
-            .catch(setError);
-        }
-      }).catch(setError);
-    }
-  }, [error, paragonUserToken]);
-
-  return {
-    paragonConnect,
-    user,
-    error,
-    updateUser,
-  };
-}
 
 export function useIntegrationMetadata() {
   return useQuery({
