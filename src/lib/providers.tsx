@@ -93,6 +93,12 @@ export function ParagonProvider({
   );
   const [user, setUser] = useState<AuthenticatedConnectUser | null>(null);
   const [error, setError] = useState();
+  const [mounted, setMounted] = useState(false);
+
+  // Ensure we're on the client side
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const updateUser = useCallback(async () => {
     if (!paragon) {
@@ -108,6 +114,8 @@ export function ParagonProvider({
 
   // Listen for account state changes
   useEffect(() => {
+    if (!mounted) return;
+    
     // @ts-ignore
     window.paragon = paragon;
     // @ts-ignore
@@ -120,9 +128,12 @@ export function ParagonProvider({
       // @ts-ignore
       paragon.unsubscribe("onIntegrationUninstall", updateUser);
     };
-  }, [updateUser]);
+  }, [updateUser, mounted]);
 
   useEffect(() => {
+    // Only authenticate after component has mounted on client side
+    if (!mounted) return;
+    
     // If:
     // - There is no error
     // - The user is null or not authenticated
@@ -137,7 +148,7 @@ export function ParagonProvider({
         .then(updateUser)
         .catch(setError);
     }
-  }, [error, paragonUserToken, user, updateUser]);
+  }, [error, paragonUserToken, user, updateUser, mounted]);
 
   paragon.ExternalFilePicker = filePickerClass;
 

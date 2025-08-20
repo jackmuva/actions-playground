@@ -9,7 +9,7 @@ export default async function Actions() {
 
   return (
     <div className="min-h-dvh w-dvw flex flex-col md:flex-row px-2 md:px-8 pt-18">
-      <ParagonProviderWrapper>
+      <ParagonProviderWrapper paragonUserToken={session?.paragonUserToken}>
         <Navbar />
         <IntegrationsSidebar session={session} />
         <ActionTester session={session} />

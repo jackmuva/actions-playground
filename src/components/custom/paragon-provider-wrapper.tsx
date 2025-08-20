@@ -1,16 +1,18 @@
-import { userWithToken } from "@/lib/auth";
+'use client';
 import { ParagonProvider } from "@/lib/providers";
 import { ReactNode } from "react";
 
-export async function ParagonProviderWrapper({
-	children,
-}: {
+interface ParagonProviderWrapperProps {
 	children: ReactNode;
-}) {
-	const session = await userWithToken();
+	paragonUserToken?: string;
+}
 
+export function ParagonProviderWrapper({
+	children,
+	paragonUserToken,
+}: ParagonProviderWrapperProps) {
 	return (
-		<ParagonProvider paragonUserToken={session?.paragonUserToken}>
+		<ParagonProvider paragonUserToken={paragonUserToken}>
 			{children}
 		</ParagonProvider>
 	);
