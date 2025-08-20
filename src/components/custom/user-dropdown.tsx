@@ -13,10 +13,8 @@ export function UserDropdown({ user }: any) {
 
 	return (
 		<>
-			<div
-				className="flex items-center space-x-2 border-2 rounded-sm py-1 px-4 cursor-pointer hover:bg-gray-50 transition-colors"
-				onClick={toggleLogout}
-			>
+			<div className="flex items-center space-x-2 border rounded-sm py-1 px-4 cursor-pointer hover:bg-gray-50 transition-colors"
+				onClick={toggleLogout} >
 				<User size={20} />
 				<div>
 					{user?.firstName}
