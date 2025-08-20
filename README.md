@@ -25,11 +25,14 @@ bun dev
 - tooltips for tabs
 
 ## Playground Goals
-Our goal: Have prospects and customers understand **what ActionKit is and what the value is**. We want to give them a frictionless experience 
+### Our goal: 
+Have prospects and customers understand **what ActionKit is and what the value is**. We want to give them a frictionless experience 
 on using actionkit and demo a few popular use cases
 
-Why our audience cares: they want to learn more about what actionkit is and what/how they can build with it
+### Why our audience cares: 
+they want to learn more about what actionkit is and what/how they can build with it
 
-Customer journey: we assume that the audience has some context of what Paragon and Actionkit is. We will provide tooltips, links to docs, 
+### Customer journey: 
+we assume that the audience has some context of what Paragon and Actionkit is. We will provide tooltips, links to docs, 
 api calls, and an intro page to remind/provide the audience with additional context on what ActionKit is and use cases they can 
 build with it
