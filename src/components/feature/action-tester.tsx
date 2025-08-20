@@ -9,10 +9,10 @@ import {
   type ConnectInputValue,
   type SerializedConnectInput,
 } from '@useparagon/connect';
-import { useMutation, useQuery } from '@tanstack/react-query';
 import { SerializedConnectInputPicker } from './serialized-connect-input-picker';
 import inputsMapping from '@/lib/inputsMapping.json';
 import useParagon from '@/lib/hooks';
+import useSWR from 'swr'
 
 const IntegrationTitle = ({ integration }: { integration: string | null }) => {
   const integrations = paragon.getIntegrationMetadata();
@@ -49,34 +49,33 @@ export default function ActionTester({ session }: { session: { paragonUserToken?
   const integrationMetadata = integrations?.find((i) => i.type === integration);
   const [integrationQuery, setIntegrationQuery] = useState('');
 
-  const actions = useQuery<ParagonAction[]>({
-    queryKey: ['actions', integration],
-    queryFn: async () => {
-      //@ts-expect-error is type Authenticated Connected User
-      if (!integration || !user?.integrations[integration]?.enabled) {
-        return [] as ParagonAction[];
-      }
-      const response = await fetch(
-        `https://actionkit.useparagon.com/projects/${process.env.NEXT_PUBLIC_PARAGON_PROJECT_ID}/actions?integrations=${integration}&format=paragon`,
-        {
-          headers: {
-            Authorization: `Bearer ${session.paragonUserToken}`,
-          },
+  const { data: actions, isLoading: actionsIsLoading } = useSWR(`actions/${integration}`, async () => {
+    //@ts-expect-error is type Authenticated Connected User
+    if (!integration || !user?.integrations[integration]?.enabled) {
+      return [] as ParagonAction[];
+    }
+    const response = await fetch(
+      `https://actionkit.useparagon.com/projects/${process.env.NEXT_PUBLIC_PARAGON_PROJECT_ID}/actions?integrations=${integration}&format=paragon`,
+      {
+        headers: {
+          Authorization: `Bearer ${session.paragonUserToken}`,
         },
-      );
-      const data = await response.json();
-      return ((integration && data.actions[integration]) ?? []) as ParagonAction[];
-    },
+      },
+    );
+    const data = await response.json();
+    return ((integration && data.actions[integration]) ?? []) as ParagonAction[];
   });
+
   const [action, setAction] = useState<string | null>(null);
+  const [runAction, setRunAction] = useState<boolean>(false);
   const [inputValues, setInputValues] = useState<
     Record<string, ConnectInputValue>
   >({});
   const [actionQuery, setActionQuery] = useState('');
 
   const selectedAction: ParagonAction | null = useMemo(() => {
-    return actions.data?.find((a) => a.name === action) ?? null;
-  }, [actions.data, action]);
+    return actions?.find((a) => a.name === action) ?? null;
+  }, [actions, action]);
 
   const filteredIntegrations = useMemo(() => {
     const query = integrationQuery.trim().toLowerCase();
@@ -90,7 +89,7 @@ export default function ActionTester({ session }: { session: { paragonUserToken?
   }, [integrations, integrationQuery]);
 
   const filteredActions = useMemo(() => {
-    const list = actions.data ?? [];
+    const list = actions ?? [];
     const query = actionQuery.trim().toLowerCase();
     if (!query) return list;
     return list.filter((a) => {
@@ -98,7 +97,7 @@ export default function ActionTester({ session }: { session: { paragonUserToken?
       const name = (a.name ?? '').toLowerCase();
       return title.includes(query) || name.includes(query);
     });
-  }, [actions.data, actionQuery]);
+  }, [actions, actionQuery]);
 
   useEffect(() => {
     if (!selectedAction) {
@@ -118,33 +117,35 @@ export default function ActionTester({ session }: { session: { paragonUserToken?
     setInputValues(initial);
   }, [selectedAction]);
 
-  const runAction = useMutation({
-    mutationFn: async () => {
-      if (!selectedAction) {
-        throw new Error('No action selected');
-      }
-      const response = await fetch(
-        `https://actionkit.useparagon.com/projects/${process.env.NEXT_PUBLIC_PARAGON_PROJECT_ID}/actions`,
-        {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${session.paragonUserToken}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            action: selectedAction.name,
-            parameters: inputValues,
-          }),
+  const { data: actionData, error: actionError, mutate: actionMutate, isLoading: actionIsLoading } = useSWR(`run/action`, async () => {
+    if (!selectedAction) {
+      throw new Error('No action selected');
+    }
+    const response = await fetch(
+      `https://actionkit.useparagon.com/projects/${process.env.NEXT_PUBLIC_PARAGON_PROJECT_ID}/actions`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${session.paragonUserToken}`,
+          'Content-Type': 'application/json',
         },
-      );
-      if (!response.ok) {
-        const error = await response.json();
-        throw error;
-      }
-      const data = await response.json();
-      return data;
-    },
-  });
+        body: JSON.stringify({
+          action: selectedAction.name,
+          parameters: inputValues,
+        }),
+      },
+    );
+    if (!response.ok) {
+      const error = await response.json();
+      throw error;
+    }
+    const data = await response.json();
+    return data;
+  },
+    {
+      revalidateOnMount: false, // Don't run on mount
+      revalidateOnFocus: false, // Don't run on focus
+    });
 
   const [isDisconnecting, setIsDisconnecting] = useState(false);
 
@@ -240,7 +241,7 @@ export default function ActionTester({ session }: { session: { paragonUserToken?
             placeholder="Select an Action"
             allowClear
             required
-            isFetching={actions.isLoading}
+            isFetching={actionsIsLoading}
             //@ts-expect-error is type Authenticated Connected User
             disabled={!integration || !user.integrations[integration]?.enabled}
             onSelect={(value) => setAction(value ?? null)}
@@ -251,7 +252,7 @@ export default function ActionTester({ session }: { session: { paragonUserToken?
             }}
             onDebouncedChange={setActionQuery}
             renderValue={(value) => (
-              <p>{actions.data?.find((a) => a.name === value)?.title}</p>
+              <p>{actions?.find((a) => a.name === value)?.title}</p>
             )}
           >
             {filteredActions.map((action) => (
@@ -275,11 +276,13 @@ export default function ActionTester({ session }: { session: { paragonUserToken?
           <div>
             <Button
               className="bg-indigo-500 hover:bg-indigo-600 text-white"
-              disabled={!selectedAction || runAction.isPending}
-              onClick={() => runAction.mutate()}
+              disabled={!selectedAction || actionIsLoading}
+              onClick={() => {
+                actionMutate(undefined, {revalidate: true});
+              }}
             >
               <Play className="size-3 mr-1 fill-white" /> Run Action{' '}
-              {runAction.isPending && (
+              {actionIsLoading && (
                 <Loader2 className="size-4 animate-spin" />
               )}
             </Button>
@@ -290,36 +293,36 @@ export default function ActionTester({ session }: { session: { paragonUserToken?
         <div className="flex justify-between items-center mb-4">
           <h1 className="font-bold">Output</h1>
           <div className="flex gap-2 items-center">
-            {runAction.isSuccess && <Check className="size-5 text-green-600" />}
-            {runAction.isError && (
+            {!actionIsLoading && !actionError && <Check className="size-5 text-green-600" />}
+            {actionError && (
               <XCircle className="size-5 fill-red-500 text-white" />
             )}
-            {runAction.isPending && <Loader2 className="size-4 animate-spin" />}
+            {actionIsLoading && <Loader2 className="size-4 animate-spin" />}
             <p className="text-sm font-semibold text-neutral-600">
-              {runAction.isSuccess
+              {!actionIsLoading && !actionError
                 ? 'Success'
-                : runAction.isError
+                : actionError
                   ? 'Error'
-                  : runAction.isPending
+                  : actionIsLoading
                     ? 'Running...'
                     : ''}
             </p>
           </div>
         </div>
-        {runAction.data || runAction.error ? (
+        {actionData || actionError ? (
           <div className="flex flex-col gap-2 h-full">
             <pre className="text-xs p-2 bg-neutral-100 rounded-md overflow-x-scroll">
-              {runAction.data
-                ? JSON.stringify(runAction.data, null, 2)
-                : runAction.error
-                  ? JSON.stringify(runAction.error, null, 2)
+              {actionData
+                ? JSON.stringify(actionData, null, 2)
+                : actionError
+                  ? JSON.stringify(actionError, null, 2)
                   : ''}
             </pre>
           </div>
         ) : (
           <div className="flex flex-col gap-2 border border-neutral-200 rounded-md p-4">
             <p className="text-center text-neutral-500 dark:text-neutral-400 text-sm">
-              {runAction.isPending
+              {actionIsLoading
                 ? 'Running...'
                 : 'Run an Action to see the output here.'}
             </p>
