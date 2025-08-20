@@ -1,5 +1,4 @@
 'use client';
-
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import ConnectSDK, { ExternalFilePicker } from "@useparagon/connect/ConnectSDK";
 import type {
@@ -138,7 +137,7 @@ export function ParagonProvider({
         .then(updateUser)
         .catch(setError);
     }
-  }, [error, paragonUserToken, updateUser]);
+  }, [error, paragonUserToken, user, updateUser]);
 
   paragon.ExternalFilePicker = filePickerClass;
 
