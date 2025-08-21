@@ -146,8 +146,8 @@ export default function ActionTester({ session }: { session: { paragonUserToken?
   }, [selectedAction]);
 
   return (
-    <div className="flex gap-4 h-full relative w-full max-h-[calc(100dvh-10rem)]">
-      <div className="flex-1 w-1/2">
+    <div className="flex flex-col md:flex-row gap-4 h-full relative w-full max-h-[calc(100dvh-10rem)]">
+      <div className="flex-1 w-full md:w-1/2">
         <h1 className="font-bold mb-4">Actions</h1>
         <div className="flex flex-col gap-6 overflow-x-scroll max-h-full border border-neutral-200 rounded-md p-2">
           <div className="flex flex-col gap-2 ">
@@ -281,7 +281,7 @@ export default function ActionTester({ session }: { session: { paragonUserToken?
           </div>
         </div>
       </div>
-      <div className="w-1/2">
+      <div className="w-full md:w-1/2">
         <div className="flex flex-col space-y-2 justify-between items-start mb-4">
           <h1 className="font-bold">API Call</h1>
           <div className="w-full flex flex-col gap-2 h-full">
