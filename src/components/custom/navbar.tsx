@@ -13,12 +13,13 @@ export function Navbar({ session }: { session: { user: any, paragonUserToken?: s
 	return (
 		<div className="absolute top-0 right-0 z-30 border-b h-24 w-full flex flex-col px-4 pt-4">
 			<div className="flex justify-between items-center h-1/2">
-				<div className="flex space-x-1">
+				<a href="/" target="_self"
+					className="flex space-x-1">
 					<Image src={"./paragon-no-text.svg"} alt="Paragon logo" height={20} width={20} />
 					<h1 className="font-semibold text-xl">
 						Actionkit Playground
 					</h1>
-				</div>
+				</a>
 				<div className="flex space-x-2 items-center">
 					<Button size={"default"} variant={"indigo"} className="">
 						<a href="https://docs.useparagon.com/actionkit/overview" target="_blank"

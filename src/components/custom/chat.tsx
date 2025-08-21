@@ -9,31 +9,33 @@ export default function Chat() {
 	const { messages, sendMessage } = useChat();
 
 	return (
-		<div className="relative flex flex-col w-full min-h-full">
-			{messages.length === 0 ? (
-				<ChatIntro />
-			) : (
-				messages.map(message => (
-					<div key={message.id} className="whitespace-pre-wrap">
-						{message.parts.map((part, i) => {
-							return <ChatMessage key={`${message.id}-${i}`}
-								message={message}
-								part={part} />
-						})}
-					</div>
-				))
-			)}
-			<form onSubmit={e => {
-				e.preventDefault();
-				sendMessage({ text: input });
-				setInput('');
-			}} >
-				<input className="absolute bottom-0 w-full p-4 border rounded-md
+		<div className='w-full flex justify-center'>
+			<div className="relative flex flex-col w-full max-w-[800px] min-h-full">
+				{messages.length === 0 ? (
+					<ChatIntro />
+				) : (
+					messages.map(message => (
+						<div key={message.id} className="whitespace-pre-wrap">
+							{message.parts.map((part, i) => {
+								return <ChatMessage key={`${message.id}-${i}`}
+									message={message}
+									part={part} />
+							})}
+						</div>
+					))
+				)}
+				<form onSubmit={e => {
+					e.preventDefault();
+					sendMessage({ text: input });
+					setInput('');
+				}} >
+					<input className="absolute bottom-0 w-full p-4 border rounded-md
 					 bg-background-muted/50 outline-none"
-					value={input}
-					placeholder="Try prompting for an action..."
-					onChange={e => setInput(e.currentTarget.value)} />
-			</form>
+						value={input}
+						placeholder="Try prompting for an action..."
+						onChange={e => setInput(e.currentTarget.value)} />
+				</form>
+			</div>
 		</div>
 	);
 }

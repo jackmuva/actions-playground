@@ -301,7 +301,7 @@ export default function ActionTester({ session }: { session: { paragonUserToken?
             <h1 className="font-bold">API Call</h1>
             <Tooltip>
               <TooltipTrigger>
-                <Info size={15} />
+                <Info size={12} />
               </TooltipTrigger>
               <TooltipContent>
                 <p className="text-sm text-wrap text-center">
