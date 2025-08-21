@@ -282,7 +282,7 @@ export default function ActionTester({ session }: { session: { paragonUserToken?
         </div>
       </div>
       <div className="w-full md:w-1/2">
-        <div className="flex flex-col space-y-2 justify-between items-start mb-4">
+        <div className="flex flex-col space-y-4 justify-between items-start mb-4">
           <h1 className="font-bold">API Call</h1>
           <div className="w-full flex flex-col gap-2 h-full">
             {actionData || actionError || actionIsLoading ? (
