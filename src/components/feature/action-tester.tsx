@@ -48,6 +48,10 @@ export default function ActionTester({ session }: { session: { paragonUserToken?
   const integrations = paragonConnect?.getIntegrationMetadata();
   const integrationMetadata = integrations?.find((i) => i.type === integration);
   const [integrationQuery, setIntegrationQuery] = useState('');
+  const [action, setAction] = useState<string | null>(null);
+  const [inputValues, setInputValues] = useState<Record<string, ConnectInputValue>>({});
+  const [actionQuery, setActionQuery] = useState('');
+  const [isDisconnecting, setIsDisconnecting] = useState(false);
 
   const { data: actions, isLoading: actionsIsLoading } = useSWR(`actions/${integration}`, async () => {
     //@ts-expect-error is type Authenticated Connected User
@@ -66,12 +70,36 @@ export default function ActionTester({ session }: { session: { paragonUserToken?
     return ((integration && data.actions[integration]) ?? []) as ParagonAction[];
   });
 
-  const [action, setAction] = useState<string | null>(null);
-  const [runAction, setRunAction] = useState<boolean>(false);
-  const [inputValues, setInputValues] = useState<
-    Record<string, ConnectInputValue>
-  >({});
-  const [actionQuery, setActionQuery] = useState('');
+  const { data: actionData, error: actionError, mutate: actionMutate, isLoading: actionIsLoading } = useSWR(`run/action`, async () => {
+    if (!selectedAction) {
+      throw new Error('No action selected');
+    }
+    const response = await fetch(
+      `https://actionkit.useparagon.com/projects/${process.env.NEXT_PUBLIC_PARAGON_PROJECT_ID}/actions`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${session.paragonUserToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: selectedAction.name,
+          parameters: inputValues,
+        }),
+      },
+    );
+    if (!response.ok) {
+      const error = await response.json();
+      throw error;
+    }
+    const data = await response.json();
+    return data;
+  },
+    {
+      revalidateOnMount: false, // Don't run on mount
+      revalidateOnFocus: false, // Don't run on focus
+    });
+
 
   const selectedAction: ParagonAction | null = useMemo(() => {
     return actions?.find((a) => a.name === action) ?? null;
@@ -116,42 +144,6 @@ export default function ActionTester({ session }: { session: { paragonUserToken?
     }
     setInputValues(initial);
   }, [selectedAction]);
-
-  const { data: actionData, error: actionError, mutate: actionMutate, isLoading: actionIsLoading } = useSWR(`run/action`, async () => {
-    if (!selectedAction) {
-      throw new Error('No action selected');
-    }
-    const response = await fetch(
-      `https://actionkit.useparagon.com/projects/${process.env.NEXT_PUBLIC_PARAGON_PROJECT_ID}/actions`,
-      {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${session.paragonUserToken}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          action: selectedAction.name,
-          parameters: inputValues,
-        }),
-      },
-    );
-    if (!response.ok) {
-      const error = await response.json();
-      throw error;
-    }
-    const data = await response.json();
-    return data;
-  },
-    {
-      revalidateOnMount: false, // Don't run on mount
-      revalidateOnFocus: false, // Don't run on focus
-    });
-
-  const [isDisconnecting, setIsDisconnecting] = useState(false);
-
-  if (!user || !integrations) {
-    return <div>Loading...</div>;
-  }
 
   return (
     <div className="flex gap-4 h-full relative w-full max-h-[calc(100dvh-10rem)]">
@@ -278,7 +270,7 @@ export default function ActionTester({ session }: { session: { paragonUserToken?
               className="bg-indigo-500 hover:bg-indigo-600 text-white"
               disabled={!selectedAction || actionIsLoading}
               onClick={() => {
-                actionMutate(undefined, {revalidate: true});
+                actionMutate(undefined, { revalidate: true });
               }}
             >
               <Play className="size-3 mr-1 fill-white" /> Run Action{' '}
