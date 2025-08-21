@@ -13,18 +13,15 @@ export function UserDropdown({ user }: any) {
 
 	return (
 		<>
-			<div
-				className="flex items-center space-x-2 border-2 rounded-sm py-1 px-4 cursor-pointer hover:bg-gray-50 transition-colors"
-				onClick={toggleLogout}
-			>
+			<Button variant={"outline"} onClick={toggleLogout} >
 				<User size={20} />
 				<div>
 					{user?.firstName}
 				</div>
-			</div>
+			</Button>
 			{logoutPanel && (
-				<div className="absolute top-full right-0 mt-1 w-48 bg-white border border-neutral-100 rounded-md shadow-lg py-2 z-50">
-					<div className="px-4 py-2 border-b border-neutral-100">
+				<div className="absolute top-full right-0 mt-1 w-48 bg-white border rounded-md shadow-lg py-2 z-50">
+					<div className="px-4 py-2 border-b">
 						<div className="text-sm">
 							{user?.firstName} {user?.lastName}
 						</div>
