@@ -18,6 +18,10 @@ export default async function Welcome() {
       <h2 className="text-foreground-muted text-2xl max-w-[450px] text-center">
         One API/MCP to equip your AI agent product with 1000+ integration actions
       </h2>
+      <p className="text-foreground-muted max-w-[850px] text-xl text-center">
+        Explore <strong>how actions work</strong> and check out a
+        few <strong>popular implementations</strong> of ActionKit
+      </p>
       <div className="flex space-x-5 w-64 justify-center">
         <Button size={"lg"} variant={"indigo"} className="p-0 basis-1/2">
           <a href={signUpUrl} target="_self"
@@ -25,7 +29,7 @@ export default async function Welcome() {
             Try Now
           </a>
         </Button>
-        <Button size={"lg"} variant={"indigo"} className="p-0 basis-1/2">
+        <Button size={"lg"} variant={"default"} className="p-0 basis-1/2">
           <a href="https://docs.useparagon.com/actionkit/overview" target="_blank"
             className="w-full h-full flex items-center justify-center">
             Read Docs
