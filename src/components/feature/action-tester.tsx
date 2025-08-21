@@ -48,6 +48,10 @@ export default function ActionTester({ session }: { session: { paragonUserToken?
   const integrations = paragonConnect?.getIntegrationMetadata();
   const integrationMetadata = integrations?.find((i) => i.type === integration);
   const [integrationQuery, setIntegrationQuery] = useState('');
+  const [action, setAction] = useState<string | null>(null);
+  const [inputValues, setInputValues] = useState<Record<string, ConnectInputValue>>({});
+  const [actionQuery, setActionQuery] = useState('');
+  const [isDisconnecting, setIsDisconnecting] = useState(false);
 
   const { data: actions, isLoading: actionsIsLoading } = useSWR(`actions/${integration}`, async () => {
     //@ts-expect-error is type Authenticated Connected User
@@ -66,12 +70,36 @@ export default function ActionTester({ session }: { session: { paragonUserToken?
     return ((integration && data.actions[integration]) ?? []) as ParagonAction[];
   });
 
-  const [action, setAction] = useState<string | null>(null);
-  const [runAction, setRunAction] = useState<boolean>(false);
-  const [inputValues, setInputValues] = useState<
-    Record<string, ConnectInputValue>
-  >({});
-  const [actionQuery, setActionQuery] = useState('');
+  const { data: actionData, error: actionError, mutate: actionMutate, isLoading: actionIsLoading } = useSWR(`run/action`, async () => {
+    if (!selectedAction) {
+      throw new Error('No action selected');
+    }
+    const response = await fetch(
+      `https://actionkit.useparagon.com/projects/${process.env.NEXT_PUBLIC_PARAGON_PROJECT_ID}/actions`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${session.paragonUserToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: selectedAction.name,
+          parameters: inputValues,
+        }),
+      },
+    );
+    if (!response.ok) {
+      const error = await response.json();
+      throw error;
+    }
+    const data = await response.json();
+    return data;
+  },
+    {
+      revalidateOnMount: false, // Don't run on mount
+      revalidateOnFocus: false, // Don't run on focus
+    });
+
 
   const selectedAction: ParagonAction | null = useMemo(() => {
     return actions?.find((a) => a.name === action) ?? null;
@@ -117,45 +145,9 @@ export default function ActionTester({ session }: { session: { paragonUserToken?
     setInputValues(initial);
   }, [selectedAction]);
 
-  const { data: actionData, error: actionError, mutate: actionMutate, isLoading: actionIsLoading } = useSWR(`run/action`, async () => {
-    if (!selectedAction) {
-      throw new Error('No action selected');
-    }
-    const response = await fetch(
-      `https://actionkit.useparagon.com/projects/${process.env.NEXT_PUBLIC_PARAGON_PROJECT_ID}/actions`,
-      {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${session.paragonUserToken}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          action: selectedAction.name,
-          parameters: inputValues,
-        }),
-      },
-    );
-    if (!response.ok) {
-      const error = await response.json();
-      throw error;
-    }
-    const data = await response.json();
-    return data;
-  },
-    {
-      revalidateOnMount: false, // Don't run on mount
-      revalidateOnFocus: false, // Don't run on focus
-    });
-
-  const [isDisconnecting, setIsDisconnecting] = useState(false);
-
-  if (!user || !integrations) {
-    return <div>Loading...</div>;
-  }
-
   return (
-    <div className="flex gap-4 h-full relative w-full max-h-[calc(100dvh-10rem)]">
-      <div className="flex-1 w-1/2">
+    <div className="flex flex-col md:flex-row gap-4 h-full relative w-full max-h-[calc(100dvh-10rem)]">
+      <div className="flex-1 w-full md:w-1/2">
         <h1 className="font-bold mb-4">Actions</h1>
         <div className="flex flex-col gap-6 overflow-x-scroll max-h-full border border-neutral-200 rounded-md p-2">
           <div className="flex flex-col gap-2 ">
@@ -278,7 +270,7 @@ export default function ActionTester({ session }: { session: { paragonUserToken?
               className="bg-indigo-500 hover:bg-indigo-600 text-white"
               disabled={!selectedAction || actionIsLoading}
               onClick={() => {
-                actionMutate(undefined, {revalidate: true});
+                actionMutate(undefined, { revalidate: true });
               }}
             >
               <Play className="size-3 mr-1 fill-white" /> Run Action{' '}
@@ -289,7 +281,34 @@ export default function ActionTester({ session }: { session: { paragonUserToken?
           </div>
         </div>
       </div>
-      <div className="w-1/2">
+      <div className="w-full md:w-1/2">
+        <div className="flex flex-col space-y-2 justify-between items-start mb-4">
+          <h1 className="font-bold">API Call</h1>
+          <div className="w-full flex flex-col gap-2 h-full">
+            {actionData || actionError || actionIsLoading ? (
+              <div className="flex flex-col gap-2 h-full">
+                <pre className="text-xs p-2 bg-neutral-100 rounded-md overflow-x-scroll">
+                  POST https://actionkit.useparagon.com/projects/PARAGON_PROJECT_ID/actions,<br />
+                  headers: &#123;<br />
+                  &nbsp;Authorization: &apos;Bearer PARAGON_SIGNED_TOKEN&apos;,<br />
+                  &nbsp;Content-Type: &apos;application/json&apos;,<br />
+                  &#125;,<br />
+                  body: &#123;<br />
+                  &nbsp;action: {selectedAction?.name},<br />
+                  &nbsp;parameters: {JSON.stringify(inputValues)},<br />
+                  &#125;
+                </pre>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-2 border border-neutral-200 rounded-md p-4">
+                <p className="text-center text-neutral-500 dark:text-neutral-400 text-sm">
+                  Run an Action to see the API call.
+                </p>
+              </div>
+            )}
+          </div>
+
+        </div>
         <div className="flex justify-between items-center mb-4">
           <h1 className="font-bold">Output</h1>
           <div className="flex gap-2 items-center">
