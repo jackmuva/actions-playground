@@ -290,8 +290,8 @@ export default function ActionTester({ session }: { session: { paragonUserToken?
                 <pre className="text-xs p-2 bg-neutral-100 rounded-md overflow-x-scroll">
                   POST https://actionkit.useparagon.com/projects/PARAGON_PROJECT_ID/actions,<br />
                   headers: &#123;<br />
-                  &nbsp;Authorization: 'Bearer PARAGON_SIGNED_TOKEN',<br />
-                  &nbsp;Content-Type: 'application/json',<br />
+                  &nbsp;Authorization: &apos;Bearer PARAGON_SIGNED_TOKEN&apos;,<br />
+                  &nbsp;Content-Type: &apos;application/json&apos;,<br />
                   &#125;,<br />
                   body: &#123;<br />
                   &nbsp;action: {selectedAction?.name},<br />
