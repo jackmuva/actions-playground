@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ComboboxField } from '../form/combobox-field';
 import { Button } from '../ui/button';
-import { Check, Loader2, Play, XCircle } from 'lucide-react';
+import { Check, Info, Loader2, Play, XCircle } from 'lucide-react';
 import {
   paragon,
   SidebarInputType,
@@ -13,6 +13,7 @@ import { SerializedConnectInputPicker } from './serialized-connect-input-picker'
 import inputsMapping from '@/lib/inputsMapping.json';
 import useParagon from '@/lib/hooks';
 import useSWR from 'swr'
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 
 const IntegrationTitle = ({ integration }: { integration: string | null }) => {
   const integrations = paragon.getIntegrationMetadata();
@@ -148,7 +149,20 @@ export default function ActionTester({ session }: { session: { paragonUserToken?
   return (
     <div className="flex flex-col md:flex-row gap-4 h-full relative w-full max-h-[calc(100dvh-10rem)]">
       <div className="flex-1 w-full md:w-1/2">
-        <h1 className="font-bold mb-4">Actions</h1>
+        <div className='flex space-x-1 items-center mb-4'>
+          <h1 className="font-bold ">Actions</h1>
+          <Tooltip>
+            <TooltipTrigger>
+              <Info size={12} />
+            </TooltipTrigger>
+            <TooltipContent>
+              <p className="text-sm text-wrap w-96 text-center">
+                Simplify common 3rd-party APIs with Actions. ActionKit provides Actions with simplified
+                schemas and parameter descriptions to dynamically create UIs and tool descriptions.
+              </p>
+            </TooltipContent>
+          </Tooltip>
+        </div>
         <div className="flex flex-col gap-6 overflow-x-scroll max-h-full border border-neutral-200 rounded-md p-2">
           <div className="flex flex-col gap-2 ">
             <ComboboxField
@@ -282,8 +296,22 @@ export default function ActionTester({ session }: { session: { paragonUserToken?
         </div>
       </div>
       <div className="w-full md:w-1/2">
-        <div className="flex flex-col space-y-4 justify-between items-start mb-4">
-          <h1 className="font-bold">API Call</h1>
+        <div className="flex flex-col justify-between items-start mb-4">
+          <div className='mb-4 flex space-x-1 items-center'>
+            <h1 className="font-bold">API Call</h1>
+            <Tooltip>
+              <TooltipTrigger>
+                <Info size={15} />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="text-sm text-wrap text-center">
+                  Behind the scenes, Actions go through the ActionKit API.
+                  <br />
+                  Just provide the action name, input parameters, and user token.
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
           <div className="w-full flex flex-col gap-2 h-full">
             {actionData || actionError || actionIsLoading ? (
               <div className="flex flex-col gap-2 h-full">

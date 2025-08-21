@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import { UserDropdown } from "@/components/custom/user-dropdown";
-import { BookOpen, HatGlasses, WandSparkles } from "lucide-react";
+import { BookOpen, ClipboardPen, HatGlasses, WandSparkles } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { Button } from "../ui/button";
@@ -20,6 +20,13 @@ export function Navbar({ session }: { session: { user: any, paragonUserToken?: s
 					</h1>
 				</div>
 				<div className="flex space-x-2 items-center">
+					<Button size={"default"} variant={"indigo"} className="">
+						<a href="https://docs.useparagon.com/actionkit/overview" target="_blank"
+							className="space-x-2 w-full h-full flex items-center justify-center">
+							<ClipboardPen size={20} />
+							<p>Book a demo</p>
+						</a>
+					</Button>
 					<Button size={"default"} variant={"outline"} className="">
 						<a href="https://docs.useparagon.com/actionkit/overview" target="_blank"
 							className="space-x-2 w-full h-full flex items-center justify-center">

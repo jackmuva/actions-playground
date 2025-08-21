@@ -52,8 +52,7 @@ After visiting the playground, customers should:
 
 
 ### Measuring success:
-(Spitballing some metrics)
-* 5% conversion rate for non-trial users to sign up for a trial
+* hockeystack measurements
 * positive feedback from sales team on prospects that have used the playground
     * feedback that the playground helped them understand the value of ActionKit
     * feedback that the use cases are also use cases they'd like to build
