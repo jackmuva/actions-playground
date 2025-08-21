@@ -282,6 +282,33 @@ export default function ActionTester({ session }: { session: { paragonUserToken?
         </div>
       </div>
       <div className="w-1/2">
+        <div className="flex flex-col space-y-2 justify-between items-start mb-4">
+          <h1 className="font-bold">API Call</h1>
+          <div className="w-full flex flex-col gap-2 h-full">
+            {actionData || actionError || actionIsLoading ? (
+              <div className="flex flex-col gap-2 h-full">
+                <pre className="text-xs p-2 bg-neutral-100 rounded-md overflow-x-scroll">
+                  POST https://actionkit.useparagon.com/projects/PARAGON_PROJECT_ID/actions,<br />
+                  headers: &#123;<br />
+                  &nbsp;Authorization: 'Bearer PARAGON_SIGNED_TOKEN',<br />
+                  &nbsp;Content-Type: 'application/json',<br />
+                  &#125;,<br />
+                  body: &#123;<br />
+                  &nbsp;action: {selectedAction?.name},<br />
+                  &nbsp;parameters: {JSON.stringify(inputValues)},<br />
+                  &#125;
+                </pre>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-2 border border-neutral-200 rounded-md p-4">
+                <p className="text-center text-neutral-500 dark:text-neutral-400 text-sm">
+                  Run an Action to see the API call.
+                </p>
+              </div>
+            )}
+          </div>
+
+        </div>
         <div className="flex justify-between items-center mb-4">
           <h1 className="font-bold">Output</h1>
           <div className="flex gap-2 items-center">
