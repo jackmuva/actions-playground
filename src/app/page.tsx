@@ -15,7 +15,7 @@ export default async function Welcome() {
       <h1 className="font-bold text-5xl">
         ActionKit Playground
       </h1>
-      <h2 className="text-foreground-muted text-2xl max-w-[450px] text-center">
+      <h2 className="text-foreground-muted text-2xl max-w-[500px] text-center">
         One API/MCP to equip your AI agent product with 1000+ integration actions
       </h2>
       <p className="text-foreground-muted max-w-[850px] text-xl text-center">
