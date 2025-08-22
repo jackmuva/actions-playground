@@ -5,6 +5,7 @@ import { BookOpen, ClipboardPen, HatGlasses, WandSparkles } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { Button } from "../ui/button";
+import Link from "next/link";
 
 export function Navbar({ session }: { session: { user: any, paragonUserToken?: string } }) {
 	const user = session?.user;
@@ -13,16 +14,16 @@ export function Navbar({ session }: { session: { user: any, paragonUserToken?: s
 	return (
 		<div className="absolute top-0 right-0 z-30 border-b h-24 w-full flex flex-col px-4 pt-4">
 			<div className="flex justify-between items-center h-1/2">
-				<a href="/" target="_self"
+				<Link href="/"
 					className="flex space-x-1">
 					<Image src={"./paragon-no-text.svg"} alt="Paragon logo" height={20} width={20} />
 					<h1 className="font-semibold text-xl">
 						Actionkit Playground
 					</h1>
-				</a>
+				</Link>
 				<div className="flex space-x-2 items-center">
 					<Button size={"default"} variant={"indigo"} className="">
-						<a href="https://docs.useparagon.com/actionkit/overview" target="_blank"
+						<a href="https://www.useparagon.com/book-demo" target="_blank"
 							className="space-x-2 w-full h-full flex items-center justify-center">
 							<ClipboardPen size={20} />
 							<p>Book a demo</p>
@@ -58,7 +59,7 @@ export function Navbar({ session }: { session: { user: any, paragonUserToken?: s
 				<Tooltip>
 					<TooltipTrigger>
 						<a href="/agent" className={`${pathname === "/agent" ? "font-semibold underline" : ""} 
-						 flex items-center space-x-1 hover:underline`}>
+                                                flex items-center space-x-1 hover:underline`}>
 							<HatGlasses size={18} />
 							<p>Agent</p>
 						</a>

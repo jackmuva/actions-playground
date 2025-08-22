@@ -7,7 +7,7 @@ export default async function Agent() {
   const session = await userWithToken();
 
   return (
-    <div className="min-h-dvh w-dvw flex flex-col md:flex-row px-2 md:px-8 pt-28 pb-12">
+    <div className="h-dvh w-dvw flex flex-col md:flex-row px-2 md:px-8 pt-28 pb-12">
       <Navbar session={session} />
       <IntegrationsSidebar session={session} />
       <Chat />

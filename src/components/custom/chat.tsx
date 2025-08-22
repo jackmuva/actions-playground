@@ -1,41 +1,54 @@
 'use client';
 import { useChat } from '@ai-sdk/react';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { ChatIntro } from './chat-intro';
 import { ChatMessage } from './chat-message';
 
 export default function Chat() {
 	const [input, setInput] = useState('');
 	const { messages, sendMessage } = useChat();
+	const messageWindowRef = useRef<HTMLDivElement>(null);
+
+	// Auto-scroll to bottom whenever messages change
+	useEffect(() => {
+		if (messageWindowRef.current) {
+			messageWindowRef.current.scrollTop = messageWindowRef.current.scrollHeight;
+		}
+	}, [messages]);
 
 	return (
-		<div className='w-full flex justify-center'>
-			<div className="relative flex flex-col w-full max-w-[800px] min-h-full">
-				{messages.length === 0 ? (
-					<ChatIntro />
-				) : (
-					messages.map(message => (
-						<div key={message.id} className="whitespace-pre-wrap">
-							{message.parts.map((part, i) => {
-								return <ChatMessage key={`${message.id}-${i}`}
-									message={message}
-									part={part} />
-							})}
-						</div>
-					))
-				)}
+		<div className='w-full flex justify-center min-h-full max-h-full'>
+			<div className="relative flex flex-col w-full max-w-[800px] h-full 
+				 min-h-full">
+				<div ref={messageWindowRef}
+					id='message-window'
+					className='h-full mb-16 overflow-y-scroll no-scrollbar'>
+					{messages.length === 0 ? (
+						<ChatIntro />
+					) : (
+						messages.map(message => (
+							<div key={message.id} className="whitespace-pre-wrap">
+								{message.parts.map((part, i) => {
+									return <ChatMessage key={`${message.id}-${i}`}
+										message={message}
+										part={part} />
+								})}
+							</div>
+						))
+					)}
+				</div>
 				<form onSubmit={e => {
 					e.preventDefault();
 					sendMessage({ text: input });
 					setInput('');
 				}} >
 					<input className="absolute bottom-0 w-full p-4 border rounded-md
-					 bg-background-muted/50 outline-none"
+					 bg-background-muted outline-none"
 						value={input}
 						placeholder="Try prompting for an action..."
 						onChange={e => setInput(e.currentTarget.value)} />
 				</form>
-			</div>
-		</div>
+			</div >
+		</div >
 	);
 }

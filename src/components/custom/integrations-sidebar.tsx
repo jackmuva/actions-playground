@@ -11,7 +11,7 @@ export default function IntegrationsSidebar({ session }: { session: { paragonUse
 	const integrations = paragonConnect?.getIntegrationMetadata() ?? [];
 
 	return (
-		<div className="w-96 mr-2">
+		<div className="w-96 mr-2 max-h-full overflow-y-scroll">
 			<div className="flex flex-col space-y-0 items-start w-full mb-4">
 				<div className="flex space-x-1 items-center">
 					<h1 className="font-semibold ">
