@@ -35,7 +35,7 @@ const IntegrationTitle = ({ integration }: { integration: string | null }) => {
   );
 };
 
-type ParagonAction = {
+export type ParagonAction = {
   name: string;
   title: string;
   description?: string;
