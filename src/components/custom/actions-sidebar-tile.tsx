@@ -4,7 +4,7 @@ import { Button } from "../ui/button";
 import { ParagonAction } from "../feature/action-tester";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
-type IntegrationTileProps = {
+type TileProps = {
 	integration: {
 		icon: string;
 		name: string;
@@ -20,7 +20,7 @@ export function ActionsSidebarTile({
 	integrationEnabled,
 	onConnect,
 	actions,
-}: IntegrationTileProps) {
+}: TileProps) {
 	const [expanded, setExpanded] = useState(false);
 	console.log(actions);
 
@@ -104,7 +104,7 @@ export function ActionsSidebarTile({
 												{action.inputs?.map((input) => {
 													return (
 														<div key={input.id}>
-															&emsp;{input.id}: {input.placeholder}
+															&emsp;{input.id}: {input.subtitle ?? input.title}
 														</div>
 													)
 												})
