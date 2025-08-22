@@ -22,7 +22,6 @@ export function ActionsSidebarTile({
 	actions,
 }: TileProps) {
 	const [expanded, setExpanded] = useState(false);
-	console.log(actions);
 
 	const handleClick = () => {
 		if (integrationEnabled) {

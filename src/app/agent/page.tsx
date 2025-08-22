@@ -10,7 +10,7 @@ export default async function Agent() {
     <div className="h-dvh w-dvw flex flex-col md:flex-row px-2 md:px-8 pt-28 pb-12">
       <Navbar session={session} />
       <ActionsSidebar session={session} />
-      <Chat />
+      <Chat session={session} />
     </div>
   )
 }

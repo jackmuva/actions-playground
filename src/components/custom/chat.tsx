@@ -3,13 +3,14 @@ import { useChat } from '@ai-sdk/react';
 import { useState, useEffect, useRef } from 'react';
 import { ChatIntro } from './chat-intro';
 import { ChatMessage } from './chat-message';
+import useParagon from '@/lib/hooks';
 
-export default function Chat() {
+export default function Chat({ session }: { session: { paragonUserToken?: string } }) {
+	const { user } = useParagon(session.paragonUserToken ?? "");
 	const [input, setInput] = useState('');
 	const { messages, sendMessage } = useChat();
 	const messageWindowRef = useRef<HTMLDivElement>(null);
 
-	// Auto-scroll to bottom whenever messages change
 	useEffect(() => {
 		if (messageWindowRef.current) {
 			messageWindowRef.current.scrollTop = messageWindowRef.current.scrollHeight;
@@ -39,7 +40,16 @@ export default function Chat() {
 				</div>
 				<form onSubmit={e => {
 					e.preventDefault();
-					sendMessage({ text: input });
+					sendMessage({
+						text: input,
+						metadata: {
+							integrations: user?.authenticated ?
+								Object.keys(user?.integrations).filter((type) =>
+									user.integrations[type]?.enabled
+								)
+								: [],
+						},
+					});
 					setInput('');
 				}} >
 					<input className="absolute bottom-0 w-full p-4 border rounded-md

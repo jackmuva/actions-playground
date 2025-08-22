@@ -7,6 +7,11 @@ export const maxDuration = 30;
 export async function POST(req: Request) {
 	const { messages }: { messages: UIMessage[] } = await req.json();
 
+	const lastUserMessage = messages.filter(m => m.role === 'user').pop();
+	const metadata = lastUserMessage?.metadata as any;
+	console.log("messages: ", messages);
+	console.log(metadata);
+
 	const result = streamText({
 		model: openai('gpt-4o'),
 		messages: convertToModelMessages(messages),
