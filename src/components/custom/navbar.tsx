@@ -41,7 +41,7 @@ export function Navbar({ session }: { session: { user: any, paragonUserToken?: s
 					</div>
 				</div>
 			</div>
-			<div className="flex space-x-6 pl-10 h-1/2 items-end pb-1" >
+			<div className="flex space-x-6 h-1/2 items-end pb-1" >
 				<Tooltip>
 					<TooltipTrigger>
 						<a href="/actions" className={`${pathname === "/actions" ? "font-semibold underline" : ""}
