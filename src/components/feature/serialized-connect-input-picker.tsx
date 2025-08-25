@@ -252,7 +252,7 @@ export function SerializedConnectInputPicker(props: Props) {
 						onChange(
 							(f.values || []).some((it: any) => typeof it === 'object')
 								? ((v
-									? v
+									? { selected: v, dependents: {} }
 									: undefined) as unknown as ConnectInputValue)
 								: ((v ?? undefined) as unknown as ConnectInputValue),
 						)
