@@ -1,7 +1,7 @@
 import {
-  SidebarInputType,
-  type ConnectInputValue,
-  type SerializedConnectInput,
+	SidebarInputType,
+	type ConnectInputValue,
+	type SerializedConnectInput,
 } from '@useparagon/connect';
 import { TextInputField } from '../form/text-input-field';
 import { BooleanField } from '../form/boolean-field';
@@ -16,360 +16,360 @@ import { StaticEnumField } from './static-enum';
 import { ConditionalInputField } from './conditional-input';
 
 type Props = {
-  integration: string;
-  field: SerializedConnectInput;
-  value: ConnectInputValue;
-  onChange: (value: ConnectInputValue) => void;
+	integration: string;
+	field: SerializedConnectInput;
+	value: ConnectInputValue;
+	onChange: (value: ConnectInputValue) => void;
 };
 
 export function SerializedConnectInputPicker(props: Props) {
-  const { field, value, onChange } = props;
-  const required = field.required ?? true;
+	const { field, value, onChange } = props;
+	const required = field.required ?? true;
 
-  const getRawType = (f: SerializedConnectInput): string | SidebarInputType => {
-    // Some inputs use additional string identifiers not present in the SDK type
-    const t = (f as unknown as { type: string | SidebarInputType }).type;
-    return t;
-  };
+	const getRawType = (f: SerializedConnectInput): string | SidebarInputType => {
+		// Some inputs use additional string identifiers not present in the SDK type
+		const t = (f as unknown as { type: string | SidebarInputType }).type;
+		return t;
+	};
 
-  if (
-    field.type === SidebarInputType.BooleanInput ||
-    field.type === SidebarInputType.Switch
-  ) {
-    return (
-      <BooleanField
-        id={field.id}
-        title={field.title}
-        required={required}
-        value={Boolean(value ?? false)}
-        tooltip={field.tooltip}
-        onChange={(value) => onChange(value)}
-      />
-    );
-  }
+	if (
+		field.type === SidebarInputType.BooleanInput ||
+		field.type === SidebarInputType.Switch
+	) {
+		return (
+			<BooleanField
+				id={field.id}
+				title={field.title}
+				required={required}
+				value={Boolean(value ?? false)}
+				tooltip={field.tooltip}
+				onChange={(value) => onChange(value)}
+			/>
+		);
+	}
 
-  if (field.type === SidebarInputType.CopyableButtonInput) {
-    return (
-      <CopyableInput
-        id={field.id}
-        title={field.title}
-        value={String(value ?? '')}
-      />
-    );
-  }
+	if (field.type === SidebarInputType.CopyableButtonInput) {
+		return (
+			<CopyableInput
+				id={field.id}
+				title={field.title}
+				value={String(value ?? '')}
+			/>
+		);
+	}
 
-  if (
-    field.type === SidebarInputType.ValueText ||
-    getRawType(field) === SidebarInputType.TextArea ||
-    getRawType(field) === SidebarInputType.Text
-  ) {
-    return (
-      <TextInputField
-        type="text"
-        id={field.id}
-        title={field.title}
-        subtitle={field.subtitle}
-        required={required}
-        tooltip={field.tooltip}
-        value={String(value ?? '')}
-        onChange={(value) => onChange(value)}
-        placeholder={field.placeholder}
-      />
-    );
-  }
+	if (
+		field.type === SidebarInputType.ValueText ||
+		getRawType(field) === SidebarInputType.TextArea ||
+		getRawType(field) === SidebarInputType.Text
+	) {
+		return (
+			<TextInputField
+				type="text"
+				id={field.id}
+				title={field.title}
+				subtitle={field.subtitle}
+				required={required}
+				tooltip={field.tooltip}
+				value={String(value ?? '')}
+				onChange={(value) => onChange(value)}
+				placeholder={field.placeholder}
+			/>
+		);
+	}
 
-  if (getRawType(field) === SidebarInputType.Code) {
-    type WithPlaceholder = { placeholder?: string };
-    const f = field as unknown as SerializedConnectInput & WithPlaceholder;
-    return (
-      <CodeInputField
-        id={f.id}
-        title={f.title}
-        subtitle={f.subtitle}
-        required={required}
-        tooltip={f.tooltip}
-        value={String(value ?? '')}
-        onChange={(value) => onChange(value)}
-        placeholder={f.placeholder}
-      />
-    );
-  }
+	if (getRawType(field) === SidebarInputType.Code) {
+		type WithPlaceholder = { placeholder?: string };
+		const f = field as unknown as SerializedConnectInput & WithPlaceholder;
+		return (
+			<CodeInputField
+				id={f.id}
+				title={f.title}
+				subtitle={f.subtitle}
+				required={required}
+				tooltip={f.tooltip}
+				value={String(value ?? '')}
+				onChange={(value) => onChange(value)}
+				placeholder={f.placeholder}
+			/>
+		);
+	}
 
-  if (field.type === SidebarInputType.Number) {
-    return (
-      <TextInputField
-        type="number"
-        id={field.id}
-        title={field.title}
-        subtitle={field.subtitle}
-        required={required}
-        tooltip={field.tooltip}
-        value={String(value ?? '')}
-        onChange={(value) => onChange(value)}
-      />
-    );
-  }
+	if (field.type === SidebarInputType.Number) {
+		return (
+			<TextInputField
+				type="number"
+				id={field.id}
+				title={field.title}
+				subtitle={field.subtitle}
+				required={required}
+				tooltip={field.tooltip}
+				value={String(value ?? '')}
+				onChange={(value) => onChange(value)}
+			/>
+		);
+	}
 
-  if (field.type === SidebarInputType.Email) {
-    return (
-      <TextInputField
-        type="email"
-        id={field.id}
-        title={field.title}
-        required={required}
-        tooltip={field.tooltip}
-        value={String(value ?? '')}
-        onChange={(value) => onChange(value)}
-      />
-    );
-  }
+	if (field.type === SidebarInputType.Email) {
+		return (
+			<TextInputField
+				type="email"
+				id={field.id}
+				title={field.title}
+				required={required}
+				tooltip={field.tooltip}
+				value={String(value ?? '')}
+				onChange={(value) => onChange(value)}
+			/>
+		);
+	}
 
-  if (field.type === SidebarInputType.Password) {
-    return (
-      <TextInputField
-        type="password"
-        id={field.id}
-        title={field.title}
-        required={required}
-        value={String(value ?? '')}
-        tooltip={field.tooltip}
-        onChange={(value) => onChange(value)}
-      />
-    );
-  }
+	if (field.type === SidebarInputType.Password) {
+		return (
+			<TextInputField
+				type="password"
+				id={field.id}
+				title={field.title}
+				required={required}
+				value={String(value ?? '')}
+				tooltip={field.tooltip}
+				onChange={(value) => onChange(value)}
+			/>
+		);
+	}
 
-  if (field.type === SidebarInputType.URL) {
-    return (
-      <TextInputField
-        type="url"
-        id={field.id}
-        title={field.title}
-        subtitle={field.subtitle}
-        required={required}
-        value={String(value ?? '')}
-        tooltip={field.tooltip}
-        onChange={(value) => onChange(value)}
-        placeholder={field.placeholder}
-      />
-    );
-  }
+	if (field.type === SidebarInputType.URL) {
+		return (
+			<TextInputField
+				type="url"
+				id={field.id}
+				title={field.title}
+				subtitle={field.subtitle}
+				required={required}
+				value={String(value ?? '')}
+				tooltip={field.tooltip}
+				onChange={(value) => onChange(value)}
+				placeholder={field.placeholder}
+			/>
+		);
+	}
 
-  if (field.type === SidebarInputType.CustomDropdown) {
-    const options = field.customDropdownOptions ?? [];
+	if (field.type === SidebarInputType.CustomDropdown) {
+		const options = field.customDropdownOptions ?? [];
 
-    return (
-      <SelectField
-        id={field.id}
-        title={field.title}
-        required={required}
-        value={(value as string) ?? null}
-        onChange={(value) => onChange(value ?? undefined)}
-        allowClear
-      >
-        {options.map((option) => (
-          <SelectField.Item key={option.value} value={option.value}>
-            {option.label}
-          </SelectField.Item>
-        ))}
-      </SelectField>
-    );
-  }
+		return (
+			<SelectField
+				id={field.id}
+				title={field.title}
+				required={required}
+				value={(value as string) ?? null}
+				onChange={(value) => onChange(value ?? undefined)}
+				allowClear
+			>
+				{options.map((option) => (
+					<SelectField.Item key={option.value} value={option.value}>
+						{option.label}
+					</SelectField.Item>
+				))}
+			</SelectField>
+		);
+	}
 
-  if (
-    getRawType(field) === SidebarInputType.Enum ||
-    getRawType(field) === SidebarInputType.EditableEnum
-  ) {
-    type EnumOption = { value: string; label: string };
-    type EnumWithDependents = EnumOption & {
-      dependentInputs?: SerializedConnectInput[];
-    };
-    const f = field as unknown as {
-      id: string;
-      title: string;
-      type?: SidebarInputType;
-      subtitle?: string;
-      enumOptions?: Array<EnumOption>;
-      options?: Array<EnumOption>;
-      values?: Array<EnumWithDependents | EnumOption | string>;
-      defaultValue?: string;
-    };
+	if (
+		getRawType(field) === SidebarInputType.Enum ||
+		getRawType(field) === SidebarInputType.EditableEnum
+	) {
+		type EnumOption = { value: string; label: string };
+		type EnumWithDependents = EnumOption & {
+			dependentInputs?: SerializedConnectInput[];
+		};
+		const f = field as unknown as {
+			id: string;
+			title: string;
+			type?: SidebarInputType;
+			subtitle?: string;
+			enumOptions?: Array<EnumOption>;
+			options?: Array<EnumOption>;
+			values?: Array<EnumWithDependents | EnumOption | string>;
+			defaultValue?: string;
+		};
 
-    const current = (value as any) ?? {};
-    const selectedValue: string | null =
-      (typeof current === 'object' && 'selected' in current
-        ? (current.selected as string | null)
-        : (value as string | null)) ?? f.defaultValue ?? null;
-    const dependentValues: Record<string, ConnectInputValue> =
-      (typeof current === 'object' && 'dependents' in current
-        ? (current.dependents as Record<string, ConnectInputValue>)
-        : ({} as Record<string, ConnectInputValue>)) ?? {};
+		const current = (value as any) ?? {};
+		const selectedValue: string | null =
+			(typeof current === 'object' && 'selected' in current
+				? (current.selected as string | null)
+				: (value as string | null)) ?? f.defaultValue ?? null;
+		const dependentValues: Record<string, ConnectInputValue> =
+			(typeof current === 'object' && 'dependents' in current
+				? (current.dependents as Record<string, ConnectInputValue>)
+				: ({} as Record<string, ConnectInputValue>)) ?? {};
 
-    const getSelectedDefinition = (): EnumWithDependents | null => {
-      const list = (f.values ?? []) as Array<EnumWithDependents | EnumOption | string>;
-      for (const item of list) {
-        if (typeof item === 'string') {
-          if (item === selectedValue) return null;
-          continue;
-        }
-        const val = item.value;
-        if (val === selectedValue) {
-          return item as EnumWithDependents;
-        }
-      }
-      return null;
-    };
+		const getSelectedDefinition = (): EnumWithDependents | null => {
+			const list = (f.values ?? []) as Array<EnumWithDependents | EnumOption | string>;
+			for (const item of list) {
+				if (typeof item === 'string') {
+					if (item === selectedValue) return null;
+					continue;
+				}
+				const val = item.value;
+				if (val === selectedValue) {
+					return item as EnumWithDependents;
+				}
+			}
+			return null;
+		};
 
-    const selectedDefinition = getSelectedDefinition();
+		const selectedDefinition = getSelectedDefinition();
 
-    const fieldForSelector = {
-      ...f,
-      values: (f.values ?? []).map((item: any) =>
-        typeof item === 'string'
-          ? item
-          : ({
-              value: item.value,
-              label: item.label ?? String(item.value),
-            } as EnumOption),
-      ),
-    } as unknown as {
-      id: string;
-      title: string;
-      type?: SidebarInputType;
-      subtitle?: string;
-      enumOptions?: Array<EnumOption>;
-      options?: Array<EnumOption>;
-      values?: Array<EnumOption> | Array<string>;
-      defaultValue?: string;
-    };
+		const fieldForSelector = {
+			...f,
+			values: (f.values ?? []).map((item: any) =>
+				typeof item === 'string'
+					? item
+					: ({
+						value: item.value,
+						label: item.label ?? String(item.value),
+					} as EnumOption),
+			),
+		} as unknown as {
+			id: string;
+			title: string;
+			type?: SidebarInputType;
+			subtitle?: string;
+			enumOptions?: Array<EnumOption>;
+			options?: Array<EnumOption>;
+			values?: Array<EnumOption> | Array<string>;
+			defaultValue?: string;
+		};
 
-    return (
-      <div className="flex flex-col">
-        <StaticEnumField
-          field={fieldForSelector as any}
-          required={required}
-          value={selectedValue}
-          onChange={(v) =>
-            onChange(
-              (f.values || []).some((it: any) => typeof it === 'object')
-                ? ((v
-                    ? { selected: v, dependents: {} }
-                    : undefined) as unknown as ConnectInputValue)
-                : ((v ?? undefined) as unknown as ConnectInputValue),
-            )
-          }
-        />
-        {selectedValue && selectedDefinition?.dependentInputs?.length ? (
-          <div className="flex flex-col gap-6 mt-6">
-            {selectedDefinition.dependentInputs.map((child) => (
-              <SerializedConnectInputPicker
-                key={child.id}
-                integration={props.integration}
-                field={child}
-                value={dependentValues[child.id]}
-                onChange={(v) =>
-                  onChange({
-                    selected: selectedValue,
-                    dependents: { ...dependentValues, [child.id]: v },
-                  } as unknown as ConnectInputValue)
-                }
-              />)
-            )}
-          </div>
-        ) : null}
-      </div>
-    );
-  }
+		return (
+			<div className="flex flex-col">
+				<StaticEnumField
+					field={fieldForSelector as any}
+					required={required}
+					value={selectedValue}
+					onChange={(v) =>
+						onChange(
+							(f.values || []).some((it: any) => typeof it === 'object')
+								? ((v
+									? v
+									: undefined) as unknown as ConnectInputValue)
+								: ((v ?? undefined) as unknown as ConnectInputValue),
+						)
+					}
+				/>
+				{selectedValue && selectedDefinition?.dependentInputs?.length ? (
+					<div className="flex flex-col gap-6 mt-6">
+						{selectedDefinition.dependentInputs.map((child) => (
+							<SerializedConnectInputPicker
+								key={child.id}
+								integration={props.integration}
+								field={child}
+								value={dependentValues[child.id]}
+								onChange={(v) =>
+									onChange({
+										selected: selectedValue,
+										dependents: { ...dependentValues, [child.id]: v },
+									} as unknown as ConnectInputValue)
+								}
+							/>)
+						)}
+					</div>
+				) : null}
+			</div>
+		);
+	}
 
-  if (field.type === SidebarInputType.DynamicEnum) {
-    return (
-      <DynamicEnumField
-        integration={props.integration}
-        field={field}
-        required={required}
-        value={value as string}
-        onChange={(value) => props.onChange(value ?? undefined)}
-      />
-    );
-  }
+	if (field.type === SidebarInputType.DynamicEnum) {
+		return (
+			<DynamicEnumField
+				integration={props.integration}
+				field={field}
+				required={required}
+				value={value as string}
+				onChange={(value) => props.onChange(value ?? undefined)}
+			/>
+		);
+	}
 
-  if (getRawType(field) === 'CONDITIONAL') {
-    const f = field as unknown as {
-      id: string;
-      title: string;
-      subtitle?: string;
-      supportedKeys: string[];
-      supportedOperators: string[];
-    };
-    return (
-      <ConditionalInputField
-        field={f}
-        required={required}
-        value={value as unknown as any}
-        onChange={(v) => onChange(v as unknown as ConnectInputValue)}
-      />
-    );
-  }
+	if (getRawType(field) === 'CONDITIONAL') {
+		const f = field as unknown as {
+			id: string;
+			title: string;
+			subtitle?: string;
+			supportedKeys: string[];
+			supportedOperators: string[];
+		};
+		return (
+			<ConditionalInputField
+				field={f}
+				required={required}
+				value={value as unknown as any}
+				onChange={(v) => onChange(v as unknown as ConnectInputValue)}
+			/>
+		);
+	}
 
-  if (field.type === SidebarInputType.ComboInput) {
-    const currentValue: ComboInputValue = (value as ComboInputValue) ?? {
-      mainInput: undefined,
-      dependentInput: undefined,
-    };
+	if (field.type === SidebarInputType.ComboInput) {
+		const currentValue: ComboInputValue = (value as ComboInputValue) ?? {
+			mainInput: undefined,
+			dependentInput: undefined,
+		};
 
-    return (
-      <ComboInputField
-        integration={props.integration}
-        field={field}
-        required={required}
-        value={currentValue}
-        onChange={(value) => props.onChange(value ?? undefined)}
-      />
-    );
-  }
+		return (
+			<ComboInputField
+				integration={props.integration}
+				field={field}
+				required={required}
+				value={currentValue}
+				onChange={(value) => props.onChange(value ?? undefined)}
+			/>
+		);
+	}
 
-  if (field.type === SidebarInputType.DynamicComboInput) {
-    const currentValue: ComboInputValue = (value as ComboInputValue) ?? {
-      mainInput: undefined,
-      dependentInput: undefined,
-      variableInput: {},
-    };
+	if (field.type === SidebarInputType.DynamicComboInput) {
+		const currentValue: ComboInputValue = (value as ComboInputValue) ?? {
+			mainInput: undefined,
+			dependentInput: undefined,
+			variableInput: {},
+		};
 
-    return (
-      <DynamicComboInputField
-        integration={props.integration}
-        field={field}
-        required={required}
-        value={currentValue}
-        onChange={(value) => props.onChange(value ?? undefined)}
-      />
-    );
-  }
+		return (
+			<DynamicComboInputField
+				integration={props.integration}
+				field={field}
+				required={required}
+				value={currentValue}
+				onChange={(value) => props.onChange(value ?? undefined)}
+			/>
+		);
+	}
 
-  if (field.type === SidebarInputType.FieldMapper) {
-    const currentValue: FieldMappingsInputValue =
-      (value as FieldMappingsInputValue) ?? {
-        mainInput: undefined,
-        dependentInput: undefined,
-        fieldMappings: {},
-      };
+	if (field.type === SidebarInputType.FieldMapper) {
+		const currentValue: FieldMappingsInputValue =
+			(value as FieldMappingsInputValue) ?? {
+				mainInput: undefined,
+				dependentInput: undefined,
+				fieldMappings: {},
+			};
 
-    return (
-      <FieldMapperField
-        integration={props.integration}
-        field={field}
-        required={required}
-        value={currentValue}
-        onChange={(value) => props.onChange(value ?? undefined)}
-      />
-    );
-  }
+		return (
+			<FieldMapperField
+				integration={props.integration}
+				field={field}
+				required={required}
+				value={currentValue}
+				onChange={(value) => props.onChange(value ?? undefined)}
+			/>
+		);
+	}
 
-  return (
-    <div>
-      <p>Field not supported:</p>
-      <pre className="max-w-full max-h-[150px] text-sm overflow-auto bg-gray-50 p-2 rounded-md border border-gray-200">
-        {JSON.stringify(field, null, 2)}
-      </pre>
-    </div>
-  );
+	return (
+		<div>
+			<p>Field not supported:</p>
+			<pre className="max-w-full max-h-[150px] text-sm overflow-auto bg-gray-50 p-2 rounded-md border border-gray-200">
+				{JSON.stringify(field, null, 2)}
+			</pre>
+		</div>
+	);
 }
