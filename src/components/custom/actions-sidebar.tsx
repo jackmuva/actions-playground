@@ -1,14 +1,26 @@
 "use client";
-
-import { IntegrationTile } from "./integration-tile";
 import useParagon from "@/lib/hooks";
 import { Info } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import useSWR from "swr";
+import { ActionsSidebarTile } from "./actions-sidebar-tile";
 
-
-export default function IntegrationsSidebar({ session }: { session: { paragonUserToken?: string } }) {
+export default function ActionsSidebar({ session }: { session: { paragonUserToken?: string } }) {
 	const { user, paragonConnect, } = useParagon(session.paragonUserToken ?? "");
 	const integrations = paragonConnect?.getIntegrationMetadata() ?? [];
+
+	const { data: actions, isLoading: actionsIsLoading } = useSWR(`actions`, async () => {
+		const response = await fetch(
+			`https://actionkit.useparagon.com/projects/${process.env.NEXT_PUBLIC_PARAGON_PROJECT_ID}/actions?format=paragon`,
+			{
+				headers: {
+					Authorization: `Bearer ${session.paragonUserToken}`,
+				},
+			},
+		);
+		const data = await response.json();
+		return data.actions;
+	});
 
 	return (
 		<div className="w-96 mr-2 max-h-full overflow-y-scroll">
@@ -30,7 +42,7 @@ export default function IntegrationsSidebar({ session }: { session: { paragonUse
 				</div>
 			</div>
 			<div className="flex flex-wrap">
-				{user?.authenticated ? (
+				{user?.authenticated && !actionsIsLoading ? (
 					integrations
 						.sort((a, b) => {
 							if (
@@ -48,13 +60,14 @@ export default function IntegrationsSidebar({ session }: { session: { paragonUse
 							return a.type < b.type ? -1 : 1;
 						})
 						.map((integration) => (
-							<IntegrationTile
+							<ActionsSidebarTile
 								integration={integration}
 								onConnect={() => paragonConnect!.connect(integration.type, {})}
 								integrationEnabled={
 									user?.authenticated &&
 									user?.integrations?.[integration.type]?.enabled
 								}
+								actions={actions[integration.type]}
 								key={integration.type}
 							/>
 						))
