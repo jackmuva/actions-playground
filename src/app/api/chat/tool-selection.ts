@@ -15,9 +15,10 @@ export async function decideActions(integrations: Array<string>, prompt: string,
 			to complete the task`,
 	});
 
+	console.log("messages: ", messages);
 	const workerActions = await Promise.all(
 		integrationPlan.integrations.map(async integration => {
-			const { text, toolCalls, toolResults } = await generateText({
+			const result = await generateText({
 				model: openai('gpt-4o'),
 				system: `You are an agent equipped with tools on ${integration}. Explain what tools you used and why`,
 				messages: messages,
@@ -59,12 +60,11 @@ export async function decideActions(integrations: Array<string>, prompt: string,
 						})]
 					})),
 			});
-			console.log("text: ", text);
-			console.log("tool calls: ", toolCalls);
-			console.log("tool results: ", toolResults);
+			console.log("res: ", result);
+			console.log("text: ", result.text);
 
 			return {
-				text: text,
+				text: result.text,
 			};
 		}),
 	);
