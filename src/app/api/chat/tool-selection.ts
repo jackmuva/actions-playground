@@ -1,5 +1,5 @@
 import { openai } from '@ai-sdk/openai';
-import { generateObject, generateText, jsonSchema, ModelMessage, stepCountIs, tool } from 'ai';
+import { generateObject, generateText, jsonSchema, ModelMessage, stepCountIs, streamText, tool } from 'ai';
 import { z } from 'zod';
 
 export async function decideActions(integrations: Array<string>, prompt: string,
@@ -7,7 +7,7 @@ export async function decideActions(integrations: Array<string>, prompt: string,
 	const { object: integrationPlan } = await generateObject({
 		model: openai('o3-mini'),
 		schema: z.object({
-			integrations: z.array(z.string()),
+			integrations: integrations.length > 0 ? z.array(z.enum(integrations as [string, ...string[]])) : z.array(z.string()),
 			explanation: z.string(),
 		}),
 		system: `You have access to these integrations: ${integrations.join()}`,
@@ -15,10 +15,7 @@ export async function decideActions(integrations: Array<string>, prompt: string,
 			to complete the task`,
 	});
 
-	console.log("NUM TOOLS: ", Object.keys(tools).length);
-	console.log("PLAN: ", integrationPlan);
-
-	const workerActions = await Promise.all(
+	const workerResponses = await Promise.all(
 		integrationPlan.integrations.map(async integration => {
 			const toolsForIntegration = Object.fromEntries(
 				tools[integration].map((toolFunction:
@@ -61,32 +58,34 @@ export async function decideActions(integrations: Array<string>, prompt: string,
 				})
 			);
 
-			const result = await generateText({
+			const result = streamText({
 				model: openai('gpt-4o'),
 				system: `You are an agent for ${integration}. You have access to these tools: ${Object.keys(toolsForIntegration).join(', ')}.
-
 					IMPORTANT: You MUST use the available tools to help with the user's request.
 					Do not just describe what you would do - actually call the tools!`,
 				messages: messages,
 				stopWhen: stepCountIs(5),
 				tools: toolsForIntegration,
 			});
-
-			let fullMessages: Array<ModelMessage> = [];
-			for (const step of result.steps) {
-				fullMessages = [...fullMessages, ...step.response.messages];
+			return {
+				streamResult: result
 			}
+
+			// let fullMessages: Array<ModelMessage> = [];
+			// for (const step of result.steps) {
+			// 	fullMessages = [...fullMessages, ...step.response.messages];
+			// }
 			// console.log("full message of tool call agent: ", fullMessages);
 			// console.log("tool call text: ", result.text);
-			return {
-				text: result.text,
-				messages: fullMessages,
-			};
+			// return {
+			// 	text: result.text,
+			// 	messages: fullMessages,
+			// };
 		}),
 	);
 
 	return {
 		plan: integrationPlan,
-		workerActions: workerActions,
+		workerResponses: workerResponses,
 	};
 }
