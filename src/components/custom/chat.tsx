@@ -5,7 +5,6 @@ import { ChatIntro } from './chat-intro';
 import { ChatMessage } from './chat-message';
 import useParagon from '@/lib/hooks';
 import useSWR from 'swr';
-import { LoadingSkeleton } from './integrations-sidebar';
 
 export default function Chat({ session }: { session: { paragonUserToken?: string } }) {
 	const { user } = useParagon(session.paragonUserToken ?? "");

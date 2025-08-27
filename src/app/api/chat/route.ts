@@ -1,8 +1,6 @@
 import { userWithToken } from '@/lib/auth';
-import { openai } from '@ai-sdk/openai';
 import { UIMessage, convertToModelMessages, createUIMessageStream, createUIMessageStreamResponse } from 'ai';
 import { NextResponse } from 'next/server';
-import z from 'zod/v3';
 import { planWork } from './planner-worker';
 
 export const maxDuration = 30;
