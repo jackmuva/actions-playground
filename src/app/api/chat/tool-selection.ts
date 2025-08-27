@@ -15,7 +15,6 @@ export async function decideActions(integrations: Array<string>, prompt: string,
 			to complete the task`,
 	});
 
-	console.log("messages: ", messages);
 	const workerActions = await Promise.all(
 		integrationPlan.integrations.map(async integration => {
 			const toolsForIntegration = Object.fromEntries(
@@ -26,7 +25,7 @@ export async function decideActions(integrations: Array<string>, prompt: string,
 						description: toolFunction.function.title,
 						inputSchema: jsonSchema(toolFunction.function.inputs),
 						execute: async (params: any, { toolCallId }) => {
-							console.log(`🔧 EXECUTING TOOL: ${toolFunction.function.name}`);
+							console.log(`EXECUTING TOOL: ${toolFunction.function.name}`);
 							console.log(`Tool params:`, params);
 							try {
 								const response = await fetch(
@@ -70,23 +69,15 @@ export async function decideActions(integrations: Array<string>, prompt: string,
 				tools: toolsForIntegration,
 			});
 
-			console.log(`\n=== Results for ${integration} ===`);
-			console.log(`Text: ${result.text}`);
-			console.log(`Tool calls count: ${result.toolCalls.length}`);
-			console.log(`Tool results count: ${result.toolResults.length}`);
-			console.log(`Finish reason: ${result.finishReason}`);
-
-			if (result.toolCalls.length > 0) {
-				console.log(`Tool calls:`, result.toolCalls);
+			let fullMessages: Array<ModelMessage> = [];
+			for (const step of result.steps) {
+				fullMessages = [...fullMessages, ...step.response.messages];
 			}
-			if (result.toolResults.length > 0) {
-				console.log(`Tool results:`, result.toolResults);
-			}
-
+			// console.log("full message of tool call agent: ", fullMessages);
+			// console.log("tool call text: ", result.text);
 			return {
 				text: result.text,
-				toolCalls: result.toolCalls,
-				toolResults: result.toolResults,
+				messages: fullMessages,
 			};
 		}),
 	);
