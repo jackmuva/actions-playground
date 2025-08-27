@@ -1,6 +1,6 @@
 import { userWithToken } from '@/lib/auth';
 import { openai } from '@ai-sdk/openai';
-import { UIMessage, convertToModelMessages } from 'ai';
+import { UIMessage, convertToModelMessages, createUIMessageStream, createUIMessageStreamResponse } from 'ai';
 import { NextResponse } from 'next/server';
 import z from 'zod/v3';
 import { decideActions } from './tool-selection';
@@ -46,5 +46,18 @@ export async function POST(req: Request) {
 	// 	}
 	// }
 
-	return workerResponses[0].streamResult.toUIMessageStreamResponse();
+	// return workerResponses[0].streamResult.toUIMessageStream();
+	const response = createUIMessageStreamResponse({
+		status: 200,
+		statusText: "OK",
+		stream: createUIMessageStream({
+			execute({ writer }) {
+				for (const workerResponse of workerResponses) {
+					writer.merge(workerResponse.streamResult.toUIMessageStream());
+				}
+			}
+		})
+
+	});
+	return response;
 }
