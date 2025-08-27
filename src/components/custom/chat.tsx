@@ -10,7 +10,7 @@ import { LoadingSkeleton } from './integrations-sidebar';
 export default function Chat({ session }: { session: { paragonUserToken?: string } }) {
 	const { user } = useParagon(session.paragonUserToken ?? "");
 	const [input, setInput] = useState('');
-	const { messages, sendMessage } = useChat();
+	const { messages, sendMessage, status } = useChat();
 	const messageWindowRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
@@ -59,6 +59,11 @@ export default function Chat({ session }: { session: { paragonUserToken?: string
 								</div>
 							))
 						))}
+					{status === 'submitted' ? (
+						<div className='animate-pulse'>
+							hang on a sec, agent is thinking...
+						</div>
+					) : (<></>)}
 				</div>
 				<form onSubmit={e => {
 					e.preventDefault();
