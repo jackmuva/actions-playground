@@ -21,7 +21,7 @@ export default function Chat({ session }: { session: { paragonUserToken?: string
 
 	const { data: tools, isLoading: toolsAreLoading } = useSWR(`tools`, async () => {
 		const response = await fetch(
-			`https://actionkit.useparagon.com/projects/${process.env.NEXT_PUBLIC_PARAGON_PROJECT_ID}/actions?format=paragon`,
+			`https://actionkit.useparagon.com/projects/${process.env.NEXT_PUBLIC_PARAGON_PROJECT_ID}/actions`,
 			{
 				headers: {
 					Authorization: `Bearer ${session.paragonUserToken}`,

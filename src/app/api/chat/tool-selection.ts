@@ -18,30 +18,15 @@ export async function decideActions(integrations: Array<string>, prompt: string,
 	console.log("messages: ", messages);
 	const workerActions = await Promise.all(
 		integrationPlan.integrations.map(async integration => {
-			console.log(`\n=== Processing integration: ${integration} ===`);
-			console.log(`Available tools for ${integration}:`, tools[integration]);
-
-			if (!tools[integration] || tools[integration].length === 0) {
-				console.log(`No tools available for integration: ${integration}`);
-				return {
-					text: `No tools available for ${integration}`,
-					toolCalls: [],
-					toolResults: [],
-				};
-			}
-
 			const toolsForIntegration = Object.fromEntries(
-				tools[integration].map((toolFunction: { name: string, title: string, inputs: any }) => {
-					console.log("toolFunction: ", toolFunction);
-					console.log(`Registering tool: ${toolFunction.name}`);
-					console.log(`Tool description: ${toolFunction.title}`);
-					console.log(`Tool inputs:`, toolFunction.inputs);
-
-					return [toolFunction.name, tool({
-						description: toolFunction.title,
-						inputSchema: jsonSchema(toolFunction.inputs),
+				tools[integration].map((toolFunction:
+					{ type: string, function: { name: string, title: string, inputs: any } }
+				) => {
+					return [toolFunction.function.name, tool({
+						description: toolFunction.function.title,
+						inputSchema: jsonSchema(toolFunction.function.inputs),
 						execute: async (params: any, { toolCallId }) => {
-							console.log(`🔧 EXECUTING TOOL: ${toolFunction.name}`);
+							console.log(`🔧 EXECUTING TOOL: ${toolFunction.function.name}`);
 							console.log(`Tool params:`, params);
 							try {
 								const response = await fetch(
@@ -49,7 +34,7 @@ export async function decideActions(integrations: Array<string>, prompt: string,
 									{
 										method: "POST",
 										body: JSON.stringify({
-											action: toolFunction.name,
+											action: toolFunction.function.name,
 											parameters: params,
 										}),
 										headers: {
@@ -73,8 +58,6 @@ export async function decideActions(integrations: Array<string>, prompt: string,
 					})];
 				})
 			);
-
-			console.log(`Registered ${Object.keys(toolsForIntegration).length} tools for ${integration}`);
 
 			const result = await generateText({
 				model: openai('gpt-4o'),
