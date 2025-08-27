@@ -1,16 +1,8 @@
 import { UIMessage } from "ai";
-import { marked } from 'marked';
-import { useEffect } from "react";
+import Markdown from 'react-markdown';
 
 export const ChatMessage = ({ message, part }:
 	{ message: UIMessage, part: any }) => {
-	useEffect(() => {
-		const mdMessage = document.getElementById(`md-message-${message.id}`);
-		mdMessage.innerHTML = marked.parse(part.text).then(() => {
-
-		});;
-	}, [message, part]);
-
 	if (part.type === "text") {
 		return (
 			<div className={`w-fit p-2 m-1 rounded-md min-w-16 
@@ -18,9 +10,9 @@ export const ChatMessage = ({ message, part }:
 					${message.role === 'user' ?
 					"place-self-end bg-foreground-muted/20" :
 					""}`}>
-				<div id={`md-message-${message.id}`}>
+				<Markdown>
 					{part.text}
-				</div>
+				</Markdown>
 			</div>
 		);
 	} else if (part.type.substring(0, 4) === 'tool') {
