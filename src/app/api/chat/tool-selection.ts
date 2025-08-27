@@ -15,6 +15,9 @@ export async function decideActions(integrations: Array<string>, prompt: string,
 			to complete the task`,
 	});
 
+	console.log("NUM TOOLS: ", Object.keys(tools).length);
+	console.log("PLAN: ", integrationPlan);
+
 	const workerActions = await Promise.all(
 		integrationPlan.integrations.map(async integration => {
 			const toolsForIntegration = Object.fromEntries(

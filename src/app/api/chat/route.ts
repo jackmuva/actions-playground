@@ -36,31 +36,20 @@ export async function POST(req: Request) {
 	let allWorkerMessages: Array<ModelMessage> = [];
 	let filteredMessages: Array<ModelMessage> = [];
 	for (const workerAction of workerActions) {
-		filteredMessages = workerAction.messages.filter(msg => {
-			if (msg.content && typeof msg.content === 'object' && !Array.isArray(msg.content)) {
-				const content = msg.content as any;
-				if (content.type === 'tool-result' && content.toolCallId && typeof content.toolCallId === 'string') {
-					if (seenToolCallIds.has(content.toolCallId)) {
-						return false;
-					} else {
-						seenToolCallIds.add(content.toolCallId);
-						return true;
-					}
-				}
-			}
-			return true;
-		});
-		allWorkerMessages = [...filteredMessages, ...allWorkerMessages];
+		filteredMessages = [...filteredMessages, ...workerAction.messages];
+		allWorkerMessages = [...allWorkerMessages, ...filteredMessages];
 	}
 
 	console.log("MESSAGES=============");
 	for (const msg of modelMessages) {
 		console.log("Full Message: ", msg);
+		console.log("Provider Options: ", msg.providerOptions);
 	}
 
 	console.log("WORKER MESSAGES=============");
 	for (const msg of allWorkerMessages) {
 		console.log("Full Message: ", msg);
+		console.log("Provider Options: ", msg.providerOptions);
 	}
 
 	const result = streamText({

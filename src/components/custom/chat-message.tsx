@@ -6,10 +6,10 @@ export const ChatMessage = ({ message, part }:
 	if (part.type === "text") {
 		return (
 			<div className={`w-fit p-2 m-1 rounded-md min-w-16 
-					max-w-3/4
+					max-w-3/4 text-left
 					${message.role === 'user' ?
-					"text-center place-self-end bg-foreground-muted/20" :
-					"text-left"}`}>
+					"place-self-end bg-foreground-muted/20" :
+					""}`}>
 				<div>
 					{part.text}
 				</div>
