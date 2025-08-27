@@ -77,6 +77,7 @@ export default function Chat({ session }: { session: { paragonUserToken?: string
 				}} >
 					<input className="absolute bottom-0 w-full p-4 border rounded-md
 					 bg-background-muted outline-none"
+						disabled={toolsAreLoading}
 						value={input}
 						placeholder="Try prompting for an action..."
 						onChange={e => setInput(e.currentTarget.value)} />

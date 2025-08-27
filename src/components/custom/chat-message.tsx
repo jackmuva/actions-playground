@@ -1,7 +1,15 @@
 import { UIMessage } from "ai";
+import { marked } from 'marked';
+import { useEffect } from "react";
 
 export const ChatMessage = ({ message, part }:
 	{ message: UIMessage, part: any }) => {
+	useEffect(() => {
+		const mdMessage = document.getElementById(`md-message-${message.id}`);
+		mdMessage.innerHTML = marked.parse(part.text).then(() => {
+
+		});;
+	}, [message, part]);
 
 	if (part.type === "text") {
 		return (
@@ -10,7 +18,7 @@ export const ChatMessage = ({ message, part }:
 					${message.role === 'user' ?
 					"place-self-end bg-foreground-muted/20" :
 					""}`}>
-				<div>
+				<div id={`md-message-${message.id}`}>
 					{part.text}
 				</div>
 			</div>

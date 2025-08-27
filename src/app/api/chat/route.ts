@@ -25,28 +25,6 @@ export async function POST(req: Request) {
 	const { plan, workerResponses } = await decideActions(metadata.integrations, lastUserMessage?.parts[0].text, metadata.tools, modelMessages, paragonUserToken);
 	console.log("THE PLAN: ", plan);
 
-	// const seenToolCallIds = new Set<string>();
-	// let allWorkerMessages: Array<ModelMessage> = [];
-	// let filteredMessages: Array<ModelMessage> = [];
-	// for (const workerAction of workerActions) {
-	// 	filteredMessages = [...filteredMessages, ...workerAction.messages];
-	// 	allWorkerMessages = [...allWorkerMessages, ...filteredMessages];
-	// }
-	//
-	// console.log("MESSAGES=============");
-	// for (const msg of modelMessages) {
-	// 	console.log("Full Message: ", msg);
-	// }
-	//
-	// console.log("WORKER MESSAGES=============");
-	// for (const msg of allWorkerMessages) {
-	// 	console.log("ROLE: ", msg.role);
-	// 	for (const chunk of msg.content) {
-	// 		console.log("Content: ", chunk);
-	// 	}
-	// }
-
-	// return workerResponses[0].streamResult.toUIMessageStream();
 	const response = createUIMessageStreamResponse({
 		status: 200,
 		statusText: "OK",

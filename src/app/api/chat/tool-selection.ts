@@ -70,17 +70,6 @@ export async function decideActions(integrations: Array<string>, prompt: string,
 			return {
 				streamResult: result
 			}
-
-			// let fullMessages: Array<ModelMessage> = [];
-			// for (const step of result.steps) {
-			// 	fullMessages = [...fullMessages, ...step.response.messages];
-			// }
-			// console.log("full message of tool call agent: ", fullMessages);
-			// console.log("tool call text: ", result.text);
-			// return {
-			// 	text: result.text,
-			// 	messages: fullMessages,
-			// };
 		}),
 	);
 
