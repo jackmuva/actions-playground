@@ -1,37 +1,39 @@
-import { openai } from '@ai-sdk/openai';
-import { streamText, UIMessage, convertToModelMessages, stepCountIs, tool } from 'ai';
-import z from 'zod/v3';
+import { userWithToken } from '@/lib/auth';
+import { UIMessage, convertToModelMessages, createUIMessageStream, createUIMessageStreamResponse } from 'ai';
+import { NextResponse } from 'next/server';
+import { planWork } from './planner-worker';
 
 export const maxDuration = 30;
 
 export async function POST(req: Request) {
 	const { messages }: { messages: UIMessage[] } = await req.json();
+	console.log("UI MESSAGES: ", messages);
+	const { user, paragonUserToken } = await userWithToken();
+	if (!user) {
+		return NextResponse.json({
+			status: 401, message: "Unauthenticated user"
+		});
+	}
 
+	const modelMessages = convertToModelMessages(messages);
 	const lastUserMessage = messages.filter(m => m.role === 'user').pop();
 	const metadata = lastUserMessage?.metadata as any;
-	console.log("messages: ", messages);
-	console.log(metadata);
 
-	const result = streamText({
-		model: openai('gpt-4o'),
-		messages: convertToModelMessages(messages),
-		stopWhen: stepCountIs(5),
-		tools: {
-			weather: tool({
-				description: 'Get the weather in a location (fahrenheit)',
-				inputSchema: z.object({
-					location: z.string().describe('The location to get the weather for'),
-				}),
-				execute: async ({ location }) => {
-					const temperature = Math.round(Math.random() * (90 - 32) + 32);
-					return {
-						location,
-						temperature,
-					};
-				},
-			}),
-		},
+	//@ts-expect-error text does exist
+	const { plan, workerResponses } = await planWork(metadata.integrations, lastUserMessage?.parts[0].text, metadata.tools, modelMessages, paragonUserToken);
+	console.log("THE PLAN: ", plan);
+
+	const response = createUIMessageStreamResponse({
+		status: 200,
+		statusText: "OK",
+		stream: createUIMessageStream({
+			execute({ writer }) {
+				for (const workerResponse of workerResponses) {
+					writer.merge(workerResponse.streamResult.toUIMessageStream());
+				}
+			}
+		})
+
 	});
-
-	return result.toUIMessageStreamResponse();
+	return response;
 }
