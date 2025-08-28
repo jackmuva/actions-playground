@@ -130,10 +130,24 @@
   background: var(--color-radial) !important;
 }
 .no-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-  .no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.markdown ul {
+  list-style: disc outside none;
+	padding: 0;
+	margin:0;
+	display: flex;
+        flex-direction: column; /* For vertical lists */
+        gap: 10px;
+}
 
+.markdown ul li {
+  margin-left: 2em;
+  display: list-item;
+  text-align: -webkit-match-parent;
+	padding:0;
+}

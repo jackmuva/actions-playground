@@ -1,6 +1,7 @@
 import { UIMessage } from "ai";
 import { useState } from "react";
-import Markdown from 'react-markdown';
+import ReactMarkdown from 'react-markdown';
+import style from "./markdown.module.css";
 
 export const ChatMessage = ({ message, part }:
 	{ message: UIMessage, part: any }) => {
@@ -15,9 +16,11 @@ export const ChatMessage = ({ message, part }:
 					${message.role === 'user' ?
 					"place-self-end bg-foreground-muted/20" :
 					""}`}>
-				<Markdown>
-					{part.text}
-				</Markdown>
+				<div className="markdown flex flex-col space-y-2">
+					<ReactMarkdown>
+						{part.text}
+					</ReactMarkdown>
+				</div>
 			</div>
 		);
 	} else if (part.type.substring(0, 4) === 'tool') {
