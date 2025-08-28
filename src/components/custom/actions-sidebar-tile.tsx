@@ -90,7 +90,7 @@ export function ActionsSidebarTile({
 						</div>
 						<pre className={`p-2 rounded-sm text-sm bg-background-muted/20 
 						overflow-auto`}>
-							{actions.map((action) => {
+							{actions?.map((action) => {
 								return (
 									<div key={action.name} className="text-sm">
 										<Tooltip>
