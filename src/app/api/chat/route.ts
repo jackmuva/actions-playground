@@ -3,7 +3,7 @@ import { UIMessage, convertToModelMessages, createUIMessageStream, createUIMessa
 import { NextResponse } from 'next/server';
 import { planWork } from './planner-worker';
 
-export const maxDuration = 30;
+export const maxDuration = 60 * 3;
 
 export async function POST(req: Request) {
 	const { messages }: { messages: UIMessage[] } = await req.json();

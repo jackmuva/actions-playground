@@ -31,6 +31,7 @@ export default function Chat({ session }: { session: { paragonUserToken?: string
 		return data.actions;
 	});
 
+	console.log("messages: ", messages);
 	return (
 		<div className='w-full flex justify-center min-h-full max-h-full'>
 			<div className="relative flex flex-col w-full max-w-[800px] h-full 
@@ -62,7 +63,13 @@ export default function Chat({ session }: { session: { paragonUserToken?: string
 						<div className='animate-pulse'>
 							hang on a sec, agent is thinking...
 						</div>
-					) : (<></>)}
+					) : (
+						status === 'streaming' ? (
+							<div className='animate-pulse'>
+								agent is cooking...
+							</div>
+						) : (<></>)
+					)}
 				</div>
 				<form onSubmit={e => {
 					e.preventDefault();
