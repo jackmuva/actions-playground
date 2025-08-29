@@ -7,9 +7,13 @@ import useParagon from '@/lib/hooks';
 import useSWR from 'swr';
 
 export default function Chat({ session }: { session: { paragonUserToken?: string } }) {
+	const logError = (error: Error) => {
+		console.error(error);
+	}
+
 	const { user } = useParagon(session.paragonUserToken ?? "");
 	const [input, setInput] = useState('');
-	const { messages, sendMessage, status } = useChat();
+	const { messages, sendMessage, status } = useChat({ onError: logError });
 	const messageWindowRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
@@ -31,7 +35,6 @@ export default function Chat({ session }: { session: { paragonUserToken?: string
 		return data.actions;
 	});
 
-	console.log("messages: ", messages);
 	return (
 		<div className='w-full flex justify-center min-h-full max-h-full'>
 			<div className="relative flex flex-col w-full max-w-[800px] h-full 
@@ -68,7 +71,13 @@ export default function Chat({ session }: { session: { paragonUserToken?: string
 							<div className='animate-pulse'>
 								agent is cooking...
 							</div>
-						) : (<></>)
+						) : (
+							status === 'error' ? (
+								<div className='text-red-600 font-semibold'>
+									something went wrong; try a different request
+								</div>
+							) : <></>
+						)
 					)}
 				</div>
 				<form onSubmit={e => {
@@ -93,7 +102,7 @@ export default function Chat({ session }: { session: { paragonUserToken?: string
 						placeholder="Try prompting for an action..."
 						onChange={e => setInput(e.currentTarget.value)} />
 				</form>
-			</div >
-		</div >
+			</div>
+		</div>
 	);
 }

@@ -3,7 +3,7 @@ import { UIMessage, convertToModelMessages, createUIMessageStream, createUIMessa
 import { NextResponse } from 'next/server';
 import { planWork } from './planner-worker';
 
-export const maxDuration = 60 * 3;
+export const maxDuration = 180;
 
 export async function POST(req: Request) {
 	const { messages }: { messages: UIMessage[] } = await req.json();
@@ -21,7 +21,6 @@ export async function POST(req: Request) {
 
 	//@ts-expect-error text does exist
 	const { plan, workerResponses } = await planWork(metadata.integrations, lastUserMessage?.parts[0].text, metadata.tools, modelMessages, paragonUserToken);
-	console.log("THE PLAN: ", plan);
 
 	const response = createUIMessageStreamResponse({
 		status: 200,
@@ -30,8 +29,17 @@ export async function POST(req: Request) {
 			execute({ writer }) {
 				for (const workerResponse of workerResponses) {
 					writer.merge(workerResponse.streamResult.toUIMessageStream());
+					break;
 				}
-			}
+			},
+			onError: (error: unknown) => {
+				//@ts-expect-error from ai-sdk docs
+				return `Custom error: ${error.message}`
+			},
+			originalMessages: messages,
+			onFinish: ({ messages }) => {
+				console.log('Stream finished with messages:', messages);
+			},
 		})
 
 	});

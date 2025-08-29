@@ -1,5 +1,6 @@
 import { openai } from '@ai-sdk/openai';
 import { generateObject, jsonSchema, ModelMessage, stepCountIs, streamText, tool } from 'ai';
+import { last } from 'lodash';
 import { z } from 'zod';
 
 type WorkerResponse = {
@@ -8,17 +9,20 @@ type WorkerResponse = {
 
 export async function planWork(integrations: Array<string>, prompt: string,
 	tools: any, messages: Array<ModelMessage>, paragonUserToken: string) {
+	console.log("AVAILABLE TOOL INTEGRATIONS: ", Object.keys(tools));
 	const { object: integrationPlan } = await generateObject({
 		model: openai('gpt-5-nano'),
 		schema: z.object({
 			integrations: integrations.length > 0 ? z.array(z.enum(integrations as [string, ...string[]])) : z.array(z.string()),
-			explanation: z.string(),
+			integrationSpecificPrompt: z.array(z.string()),
 		}),
 		system: `You have access to these integrations: ${integrations.join()}`,
 		prompt: `Based off this request: "${prompt}", decide if an integration is needed 
 			and if needed, what integrations are involved to complete the task. 
-			Be extremely concise - one sentence - for the explanation`,
+			In the integrationSpecificPrompt, reword the request to only have 
+			information that is relevant to the specific integration`,
 	});
+	console.log("THE PLAN: ", integrationPlan);
 
 	let defaultResponse: Array<WorkerResponse> = [];
 	if (integrationPlan.integrations.length === 0) {
@@ -33,9 +37,9 @@ export async function planWork(integrations: Array<string>, prompt: string,
 	}
 
 	const workerResponses = await Promise.all(
-		integrationPlan.integrations.map(async integration => {
+		integrationPlan.integrations.map(async (integration, i) => {
 			const toolsForIntegration = Object.fromEntries(
-				tools[integration].map((toolFunction:
+				tools[integration.toLowerCase()]?.map((toolFunction:
 					{ type: string, function: { name: string, title: string, parameters: any } }
 				) => {
 					return [toolFunction.function.name, tool({
@@ -75,12 +79,25 @@ export async function planWork(integrations: Array<string>, prompt: string,
 				})
 			);
 
+			const revisedMessages: Array<ModelMessage> = [...messages];
+			revisedMessages.pop();
+			revisedMessages.push({
+				role: 'user',
+				content: [
+					{
+						type: "text",
+						text: integrationPlan.integrationSpecificPrompt[i],
+					}
+				]
+			});
+			console.log("Prompt Revision: ", integrationPlan.integrationSpecificPrompt[i]);
+
 			const result = streamText({
 				model: openai('gpt-5-nano'),
 				system: `You are an agent for ${integration}. You have access to these tools: ${Object.keys(toolsForIntegration).join(', ')}.
 					IMPORTANT: You MUST use the available tools to help with the user's request.
 					Do not just describe what you would do - actually call the tools! Do NOT forget inputs`,
-				messages: messages,
+				messages: revisedMessages,
 				stopWhen: stepCountIs(5),
 				tools: toolsForIntegration,
 			});
