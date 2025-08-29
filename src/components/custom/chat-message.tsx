@@ -9,6 +9,7 @@ export const ChatMessage = ({ message, part }:
 	const toggleExpand = () => {
 		setExpand((prev) => !prev);
 	}
+
 	if (part.type === "text") {
 		return (
 			<div className={`w-fit p-2 m-1 rounded-md min-w-16 

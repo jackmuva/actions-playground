@@ -35,7 +35,6 @@ export default function Chat({ session }: { session: { paragonUserToken?: string
 		return data.actions;
 	});
 
-	console.log("status: ", status);
 	return (
 		<div className='w-full flex justify-center min-h-full max-h-full'>
 			<div className="relative flex flex-col w-full max-w-[800px] h-full 
@@ -70,7 +69,7 @@ export default function Chat({ session }: { session: { paragonUserToken?: string
 					) : (
 						status === 'streaming' ? (
 							<div className='animate-pulse'>
-								agent is cookin(g...
+								agent is cooking...
 							</div>
 						) : (
 							status === 'error' ? (

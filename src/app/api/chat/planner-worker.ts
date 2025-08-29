@@ -9,6 +9,7 @@ type WorkerResponse = {
 
 export async function planWork(integrations: Array<string>, prompt: string,
 	tools: any, messages: Array<ModelMessage>, paragonUserToken: string) {
+	console.log("AVAILABLE TOOL INTEGRATIONS: ", Object.keys(tools));
 	const { object: integrationPlan } = await generateObject({
 		model: openai('gpt-5-nano'),
 		schema: z.object({
@@ -38,7 +39,7 @@ export async function planWork(integrations: Array<string>, prompt: string,
 	const workerResponses = await Promise.all(
 		integrationPlan.integrations.map(async (integration, i) => {
 			const toolsForIntegration = Object.fromEntries(
-				tools[integration].map((toolFunction:
+				tools[integration.toLowerCase()]?.map((toolFunction:
 					{ type: string, function: { name: string, title: string, parameters: any } }
 				) => {
 					return [toolFunction.function.name, tool({
@@ -79,13 +80,17 @@ export async function planWork(integrations: Array<string>, prompt: string,
 			);
 
 			const revisedMessages: Array<ModelMessage> = [...messages];
-			const lastMessage = revisedMessages.pop();
-			console.log('popped message: ', lastMessage);
+			revisedMessages.pop();
 			revisedMessages.push({
 				role: 'user',
-				content: integrationPlan.integrationSpecificPrompt[i],
+				content: [
+					{
+						type: "text",
+						text: integrationPlan.integrationSpecificPrompt[i],
+					}
+				]
 			});
-			console.log("Prompt Revision: ", integration, integrationPlan.integrationSpecificPrompt[i]);
+			console.log("Prompt Revision: ", integrationPlan.integrationSpecificPrompt[i]);
 
 			const result = streamText({
 				model: openai('gpt-5-nano'),
