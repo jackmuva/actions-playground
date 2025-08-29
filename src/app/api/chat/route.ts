@@ -28,7 +28,7 @@ export async function POST(req: Request) {
 		stream: createUIMessageStream({
 			execute({ writer }) {
 				for (const workerResponse of workerResponses) {
-					writer.merge(workerResponse.streamResult.toUIMessageStream());
+					writer.merge(workerResponse.streamResult);
 					break;
 				}
 			},

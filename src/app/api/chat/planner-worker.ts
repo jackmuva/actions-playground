@@ -1,10 +1,9 @@
 import { openai } from '@ai-sdk/openai';
-import { generateObject, jsonSchema, ModelMessage, stepCountIs, streamText, tool } from 'ai';
-import { last } from 'lodash';
+import { AsyncIterableStream, generateObject, InferUIMessageChunk, jsonSchema, ModelMessage, stepCountIs, streamText, tool, UIMessage } from 'ai';
 import { z } from 'zod';
 
 type WorkerResponse = {
-	streamResult: any;
+	streamResult: AsyncIterableStream<InferUIMessageChunk<UIMessage>>;
 }
 
 export async function planWork(integrations: Array<string>, prompt: string,
@@ -32,11 +31,11 @@ export async function planWork(integrations: Array<string>, prompt: string,
 			messages: messages
 		});
 		defaultResponse = [{
-			streamResult: result
+			streamResult: result.toUIMessageStream()
 		}];
 	}
 
-	const workerResponses = await Promise.all(
+	const workerResponses: Array<WorkerResponse> = await Promise.all(
 		integrationPlan.integrations.map(async (integration, i) => {
 			const toolsForIntegration = Object.fromEntries(
 				tools[integration.toLowerCase()]?.map((toolFunction:
@@ -102,7 +101,7 @@ export async function planWork(integrations: Array<string>, prompt: string,
 				tools: toolsForIntegration,
 			});
 			return {
-				streamResult: result
+				streamResult: result.toUIMessageStream()
 			}
 		}),
 	);
