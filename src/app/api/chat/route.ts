@@ -2,6 +2,7 @@ import { userWithToken } from '@/lib/auth';
 import { UIMessage, convertToModelMessages, createUIMessageStream, createUIMessageStreamResponse } from 'ai';
 import { NextResponse } from 'next/server';
 import { planWork } from './planner-worker';
+import { PassThrough } from 'node:stream';
 
 export const maxDuration = 180;
 
@@ -27,10 +28,22 @@ export async function POST(req: Request) {
 		statusText: "OK",
 		stream: createUIMessageStream({
 			execute({ writer }) {
-				for (const workerResponse of workerResponses) {
-					writer.merge(workerResponse.streamResult);
-					break;
-				}
+				return (async () => {
+					try {
+						for (const workerResponse of workerResponses) {
+							for await (const chunk of workerResponse.streamResult) {
+								writer.write(chunk);
+							}
+						}
+					} catch (error) {
+						console.error('Error processing worker streams:', error);
+						writer.write({
+							type: 'text-delta',
+							delta: `Error processing streams: ${error instanceof Error ? error.message : 'Unknown error'}`,
+							id: 'error-message'
+						});
+					}
+				})();
 			},
 			onError: (error: unknown) => {
 				//@ts-expect-error from ai-sdk docs
