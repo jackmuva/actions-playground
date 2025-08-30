@@ -2,7 +2,6 @@ import { userWithToken } from '@/lib/auth';
 import { UIMessage, convertToModelMessages, createUIMessageStream, createUIMessageStreamResponse } from 'ai';
 import { NextResponse } from 'next/server';
 import { planWork } from './planner-worker';
-import { PassThrough } from 'node:stream';
 
 export const maxDuration = 180;
 
@@ -21,7 +20,7 @@ export async function POST(req: Request) {
 	const metadata = lastUserMessage?.metadata as any;
 
 	//@ts-expect-error text does exist
-	const { plan, workerResponses } = await planWork(metadata.integrations, lastUserMessage?.parts[0].text, metadata.tools, modelMessages, paragonUserToken);
+	const { workerResponses } = await planWork(metadata.integrations, lastUserMessage?.parts[0].text, metadata.tools, modelMessages, paragonUserToken);
 
 	const response = createUIMessageStreamResponse({
 		status: 200,
