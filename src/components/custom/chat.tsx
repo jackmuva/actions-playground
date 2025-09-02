@@ -65,6 +65,13 @@ export default function Chat({ session }: { session: { paragonUserToken?: string
 				<form onSubmit={e => {
 					e.preventDefault();
 					sendMessage({
+						metadata: {
+							integrations: user?.authenticated ?
+								Object.keys(user?.integrations).filter((type) =>
+									user.integrations[type]?.enabled
+								)
+								: [],
+						},
 						text: input,
 					});
 					setInput('');

@@ -1,8 +1,7 @@
 import { userWithToken } from '@/lib/auth';
 import { experimental_createMCPClient, UIMessage, convertToModelMessages, createUIMessageStream, createUIMessageStreamResponse, stepCountIs, streamText } from 'ai';
 import { NextResponse } from 'next/server';
-import { SSEClientTransport } from '@modelcontextprotocol/sdk/client/sse.js';
-import { openai } from '@ai-sdk/openai';
+import { planWork } from './planner-worker';
 
 export const maxDuration = 180;
 
@@ -17,30 +16,45 @@ export async function POST(req: Request) {
 	}
 
 	const modelMessages = convertToModelMessages(messages);
-	const sseTransport = new SSEClientTransport(
-		new URL(process.env.MCP_SERVER!),
-	);
-	const mcpClient = await experimental_createMCPClient({
-		transport: sseTransport,
+	const lastUserMessage = messages.filter(m => m.role === 'user').pop();
+	const metadata = lastUserMessage?.metadata as any;
+
+	//@ts-expect-error text does exist
+	const { workerResponses } = await planWork(metadata.integrations, lastUserMessage?.parts[0].text, modelMessages, user.id);
+
+	const response = createUIMessageStreamResponse({
+		status: 200,
+		statusText: "OK",
+		stream: createUIMessageStream({
+			execute({ writer }) {
+				return (async () => {
+					try {
+						for (const workerResponse of workerResponses) {
+							for await (const chunk of workerResponse.streamResult) {
+								writer.write(chunk);
+							}
+						}
+					} catch (error) {
+						console.error('Error processing worker streams:', error);
+						writer.write({
+							type: 'text-delta',
+							delta: `Error processing streams: ${error instanceof Error ? error.message : 'Unknown error'}`,
+							id: 'error-message'
+						});
+					}
+				})();
+			},
+			onError: (error: unknown) => {
+				//@ts-expect-error from ai-sdk docs
+				return `Custom error: ${error.message}`
+			},
+			originalMessages: messages,
+			onFinish: ({ messages }) => {
+				console.log('Stream finished with messages:', messages);
+			},
+		})
+
 	});
-
-	try {
-		const tools = await mcpClient.tools();
-
-		const response = streamText({
-			model: openai('gpt-5-nano'),
-			tools,
-			stopWhen: stepCountIs(5),
-			messages: modelMessages,
-		});
-
-		return response.toUIMessageStreamResponse();
-	} catch (error) {
-		console.error(error);
-	}
-	// finally {
-	// 	await Promise.all([
-	// 		mcpClient.close(),
-	// 	]);
-	// }
+	return response;
 }
+
