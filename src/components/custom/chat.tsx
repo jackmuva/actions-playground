@@ -1,5 +1,6 @@
 'use client';
 import { useChat } from '@ai-sdk/react';
+import { DefaultChatTransport } from 'ai';
 import { useState, useEffect, useRef } from 'react';
 import { ChatIntro } from './chat-intro';
 import { ChatMessage } from './chat-message';
@@ -7,13 +8,13 @@ import useParagon from '@/lib/hooks';
 import useSWR from 'swr';
 
 export default function Chat({ session }: { session: { paragonUserToken?: string } }) {
-	const logError = (error: Error) => {
-		console.error(error);
-	}
-
 	const { user } = useParagon(session.paragonUserToken ?? "");
 	const [input, setInput] = useState('');
-	const { messages, sendMessage, status } = useChat({ onError: logError });
+	const { messages, sendMessage, status } = useChat({
+		transport: new DefaultChatTransport({
+			api: '/api/mcp',
+		}),
+	});
 	const messageWindowRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
