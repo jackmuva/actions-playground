@@ -19,8 +19,7 @@ export async function POST(req: Request) {
 	const lastUserMessage = messages.filter(m => m.role === 'user').pop();
 	const metadata = lastUserMessage?.metadata as any;
 
-	//@ts-expect-error text does exist
-	const { workerResponses } = await planWork(metadata.integrations, lastUserMessage?.parts[0].text, modelMessages, user.id);
+	const { workerResponses } = await planWork(metadata.integrations, modelMessages, user.id);
 
 	const response = createUIMessageStreamResponse({
 		status: 200,

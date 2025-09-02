@@ -1,5 +1,5 @@
 import { openai } from '@ai-sdk/openai';
-import { experimental_createMCPClient, AsyncIterableStream, generateObject, InferUIMessageChunk, jsonSchema, ModelMessage, stepCountIs, streamText, tool, UIMessage } from 'ai';
+import { generateText, experimental_createMCPClient, AsyncIterableStream, generateObject, InferUIMessageChunk, ModelMessage, stepCountIs, streamText, UIMessage } from 'ai';
 import { z } from 'zod';
 import { SSEClientTransport } from '@modelcontextprotocol/sdk/client/sse.js';
 
@@ -7,8 +7,15 @@ type WorkerResponse = {
 	streamResult: AsyncIterableStream<InferUIMessageChunk<UIMessage>>;
 }
 
-export async function planWork(integrations: Array<string>, prompt: string,
-	messages: Array<ModelMessage>, userId: string) {
+export async function planWork(integrations: Array<string>, messages: Array<ModelMessage>, userId: string) {
+	const { text: summarizedPrompt } = await generateText({
+		model: openai('gpt-4o'),
+		system: `Summarize the user's request`,
+		messages: messages,
+	});
+
+	console.log("Summarized Prompt...", summarizedPrompt);
+
 	const { object: integrationPlan } = await generateObject({
 		model: openai('gpt-5-nano'),
 		schema: z.object({
@@ -16,7 +23,7 @@ export async function planWork(integrations: Array<string>, prompt: string,
 			integrationSpecificPrompt: z.array(z.string()),
 		}),
 		system: `You have access to these integrations: ${integrations.join()}`,
-		prompt: `Based off this request: "${prompt}", decide if an integration is needed 
+		prompt: `Based off this request: ${summarizedPrompt}, decide if an integration is needed 
 			and if needed, what integrations are involved to complete the task. 
 			In the integrationSpecificPrompt, reword the request to only have 
 			information that is relevant to the specific integration`,
@@ -31,7 +38,6 @@ export async function planWork(integrations: Array<string>, prompt: string,
 	});
 
 	const tools = await mcpClient.tools();
-	console.log("MCP TOOLS...", tools);
 
 	let workerResponses: Array<WorkerResponse> = [];
 	if (Object.keys(tools).length === 0 || integrationPlan.integrations.length === 0) {
@@ -47,44 +53,9 @@ export async function planWork(integrations: Array<string>, prompt: string,
 		workerResponses = await Promise.all(
 			integrationPlan.integrations.map(async (integration, i) => {
 				const toolsForIntegration = Object.fromEntries(
-					tools[integration.toLowerCase()]?.map((toolFunction:
-						{ type: string, function: { name: string, title: string, parameters: any } }
-					) => {
-						return [toolFunction.function.name, tool({
-							description: toolFunction.function.title,
-							inputSchema: jsonSchema(toolFunction.function.parameters),
-							execute: async (params: any) => {
-								console.log(`EXECUTING TOOL: ${toolFunction.function.name}`);
-								console.log(`Tool params:`, params);
-								try {
-									const response = await fetch(
-										`https://actionkit.useparagon.com/projects/${process.env.NEXT_PUBLIC_PARAGON_PROJECT_ID}/actions`,
-										{
-											method: "POST",
-											body: JSON.stringify({
-												action: toolFunction.function.name,
-												parameters: params,
-											}),
-											headers: {
-												Authorization: `Bearer ${paragonUserToken}`,
-												"Content-Type": "application/json",
-											},
-										}
-									);
-									const output = await response.json();
-									if (!response.ok) {
-										throw new Error(JSON.stringify(output, null, 2));
-									}
-									return output;
-								} catch (err) {
-									if (err instanceof Error) {
-										return { error: { message: err.message } };
-									}
-									return err;
-								}
-							}
-						})];
-					})
+					Object.keys(tools)
+						.filter((tool) => integration === tool.split("_")[0].toLowerCase())
+						.map((tool) => [tool, tools[tool]])
 				);
 
 				const revisedMessages: Array<ModelMessage> = [...messages];
@@ -104,7 +75,10 @@ export async function planWork(integrations: Array<string>, prompt: string,
 					model: openai('gpt-5-nano'),
 					system: `You are an agent for ${integration}. You have access to these tools: ${Object.keys(toolsForIntegration).join(', ')}.
 					IMPORTANT: You MUST use the available tools to help with the user's request.
-					Do not just describe what you would do - actually call the tools! Do NOT forget inputs`,
+					Do not just describe what you would do - actually call the tools! Do NOT forget inputs.
+
+					If tool output directs user to enable the integration via a setup link, 
+					return the setup link in markdown format`,
 					messages: revisedMessages,
 					stopWhen: stepCountIs(5),
 					tools: toolsForIntegration,

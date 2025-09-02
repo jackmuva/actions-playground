@@ -5,7 +5,6 @@ import { useState, useEffect, useRef } from 'react';
 import { ChatIntro } from './chat-intro';
 import { ChatMessage } from './chat-message';
 import useParagon from '@/lib/hooks';
-import useSWR from 'swr';
 
 export default function Chat({ session }: { session: { paragonUserToken?: string } }) {
 	const { user } = useParagon(session.paragonUserToken ?? "");
@@ -67,10 +66,7 @@ export default function Chat({ session }: { session: { paragonUserToken?: string
 					sendMessage({
 						metadata: {
 							integrations: user?.authenticated ?
-								Object.keys(user?.integrations).filter((type) =>
-									user.integrations[type]?.enabled
-								)
-								: [],
+								Object.keys(user?.integrations) : [],
 						},
 						text: input,
 					});
