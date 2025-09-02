@@ -8,6 +8,7 @@ export async function handleSignOut() {
 export async function userWithToken() {
 	const user = (await withAuth({ ensureSignedIn: true, })).user;
 	const PRIVATE_KEY = await importPrivateKey(process.env.PARAGON_SIGNING_KEY!);
+	console.log("user ID", user.id);
 
 	if (user) {
 		try {

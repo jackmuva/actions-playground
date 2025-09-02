@@ -20,12 +20,12 @@ export async function POST(req: Request) {
 	const sseTransport = new SSEClientTransport(
 		new URL(process.env.MCP_SERVER!),
 	);
-	const clientThree = await experimental_createMCPClient({
+	const mcpClient = await experimental_createMCPClient({
 		transport: sseTransport,
 	});
 
 	try {
-		const tools = await clientThree.tools();
+		const tools = await mcpClient.tools();
 
 		const response = streamText({
 			model: openai('gpt-5-nano'),
@@ -37,9 +37,10 @@ export async function POST(req: Request) {
 		return response.toUIMessageStreamResponse();
 	} catch (error) {
 		console.error(error);
-	} finally {
-		await Promise.all([
-			clientThree.close(),
-		]);
 	}
+	// finally {
+	// 	await Promise.all([
+	// 		mcpClient.close(),
+	// 	]);
+	// }
 }

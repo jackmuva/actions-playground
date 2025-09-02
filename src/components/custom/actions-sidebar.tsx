@@ -1,15 +1,30 @@
 "use client";
+import { useEffect } from 'react';
 import useParagon from "@/lib/hooks";
 import { Info } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import useSWR from "swr";
 import { ActionsSidebarTile } from "./actions-sidebar-tile";
+import { IntegrationInstallEvent, PortalCloseEvent } from '@useparagon/connect';
 
 export default function ActionsSidebar({ session }: { session: { paragonUserToken?: string } }) {
-	const { user, paragonConnect, } = useParagon(session.paragonUserToken ?? "");
-	const integrations = paragonConnect?.getIntegrationMetadata() ?? [];
+	const { paragonConnect } = useParagon(session.paragonUserToken ?? "");
+	const integrations = paragonConnect?.getIntegrationMetadata();
 
-	const { data: actions, isLoading: actionsIsLoading } = useSWR(`actions`, async () => {
+	const { data: user, isLoading: userIsLoading } = useSWR(`user`, async () => {
+		const response = await fetch(
+			`https://api.useparagon.com/projects/${process.env.NEXT_PUBLIC_PARAGON_PROJECT_ID}/sdk/me`,
+			{
+				headers: {
+					Authorization: `Bearer ${session.paragonUserToken}`,
+				},
+			},
+		);
+		const data = await response.json();
+		return data;
+	});
+
+	const { data: actions, isLoading: actionsIsLoading } = useSWR(`agent/actions`, async () => {
 		const response = await fetch(
 			`https://actionkit.useparagon.com/projects/${process.env.NEXT_PUBLIC_PARAGON_PROJECT_ID}/actions?format=paragon`,
 			{
@@ -42,7 +57,7 @@ export default function ActionsSidebar({ session }: { session: { paragonUserToke
 				</div>
 			</div>
 			<div className="flex flex-wrap">
-				{user?.authenticated && !actionsIsLoading ? (
+				{user?.authenticated && !userIsLoading && !actionsIsLoading && integrations ? (
 					integrations
 						.sort((a, b) => {
 							if (

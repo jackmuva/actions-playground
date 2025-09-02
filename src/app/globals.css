@@ -151,3 +151,7 @@
   text-align: -webkit-match-parent;
   padding:0;
 }
+
+.markdown a {
+  @apply text-indigo-700 underline hover:text-indigo-600 font-semibold;
+}
