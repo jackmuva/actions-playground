@@ -50,7 +50,7 @@ export default function Chat({ session }: { session: { paragonUserToken?: string
 					) : (
 						status === 'streaming' ? (
 							<div className='animate-pulse'>
-								agent is cooking...
+								generating response...
 							</div>
 						) : (
 							status === 'error' ? (

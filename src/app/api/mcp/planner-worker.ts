@@ -8,14 +8,14 @@ type WorkerResponse = {
 }
 
 export async function planWork(integrations: Array<string>, messages: Array<ModelMessage>, userId: string) {
-	const { text: summarizedPrompt } = await generateText({
-		model: openai('gpt-4o'),
-		system: `Summarize the user's request`,
-		messages: messages,
-	});
-
-	console.log("Summarized Prompt...", summarizedPrompt);
-
+	const objectPrompt: ModelMessage = {
+		role: "user",
+		content: `Decide if an integration is needed 
+			and if needed, what integrations are involved to complete the task. 
+			In the integrationSpecificPrompt, reword the request to only have 
+			information that is relevant to the specific integration`
+	}
+	const objectMessages = [...messages, objectPrompt];
 	const { object: integrationPlan } = await generateObject({
 		model: openai('gpt-5-nano'),
 		schema: z.object({
@@ -23,10 +23,7 @@ export async function planWork(integrations: Array<string>, messages: Array<Mode
 			integrationSpecificPrompt: z.array(z.string()),
 		}),
 		system: `You have access to these integrations: ${integrations.join()}`,
-		prompt: `Based off this request: ${summarizedPrompt}, decide if an integration is needed 
-			and if needed, what integrations are involved to complete the task. 
-			In the integrationSpecificPrompt, reword the request to only have 
-			information that is relevant to the specific integration`,
+		messages: objectMessages
 	});
 	console.log("THE PLAN: ", integrationPlan);
 
@@ -69,7 +66,6 @@ export async function planWork(integrations: Array<string>, messages: Array<Mode
 						}
 					]
 				});
-				console.log("Prompt Revision: ", integrationPlan.integrationSpecificPrompt[i]);
 
 				const result = streamText({
 					model: openai('gpt-5-nano'),
@@ -77,8 +73,9 @@ export async function planWork(integrations: Array<string>, messages: Array<Mode
 					IMPORTANT: You MUST use the available tools to help with the user's request.
 					Do not just describe what you would do - actually call the tools! Do NOT forget inputs.
 
-					If tool output directs user to enable the integration via a setup link, 
-					return the setup link in markdown format`,
+					If the latest tool output directs user to enable the integration via a setup link, 
+					return the setup link in markdown format. Once an integration is setup, return tool 
+					outputs and not the setup link`,
 					messages: revisedMessages,
 					stopWhen: stepCountIs(5),
 					tools: toolsForIntegration,
