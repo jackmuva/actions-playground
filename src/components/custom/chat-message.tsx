@@ -1,7 +1,6 @@
 import { UIMessage } from "ai";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ReactMarkdown from 'react-markdown';
-import style from "./markdown.module.css";
 import { ChevronDownIcon } from "lucide-react";
 
 export const ChatMessage = ({ message, part }:
@@ -10,6 +9,12 @@ export const ChatMessage = ({ message, part }:
 	const toggleExpand = () => {
 		setExpand((prev) => !prev);
 	}
+	useEffect(() => {
+		const links = document.getElementsByTagName("a");
+		for (const link of links) {
+			link.target = "_blank";
+		}
+	}, [message, part]);
 
 	if (part.type === "text") {
 		return (
@@ -25,7 +30,7 @@ export const ChatMessage = ({ message, part }:
 				</div>
 			</div>
 		);
-	} else if (part.type.substring(0, 4) === 'tool') {
+	} else if (part.type.substring(0, 4) === 'tool' || part.type === 'dynamic-tool') {
 		return (
 			<div className={`p-2 m-1 rounded-md min-w-16 max-w-3/4 
 				flex flex-col ${expand ? "max-h-96" : "max-h-28"}`}>
@@ -37,7 +42,7 @@ export const ChatMessage = ({ message, part }:
 						<ChevronDownIcon className={``} size={20} />
 					</div>
 					<div className="font-semibold">
-						See Agent Using ActionKit
+						See Agent using ActionKit
 					</div>
 				</div>
 				<pre className={`p-2 text-sm bg-background-muted/20 cursor-pointer rounded-sm 
@@ -49,3 +54,17 @@ export const ChatMessage = ({ message, part }:
 		);
 	}
 }
+
+// {part.output.content.length > 0 ? (
+// 					part.output.content.map((message: { type: string, text: string }, i: number) => {
+// 						return (
+// 							<div key={i} className="markdown flex flex-col space-y-2">
+// 								<ReactMarkdown>
+// 									{message.text}
+// 								</ReactMarkdown>
+// 							</div>
+//
+// 						)
+// 					})
+// 				) : (<></>)}
+

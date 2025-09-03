@@ -2,137 +2,141 @@ import { useQuery } from '@tanstack/react-query';
 import { paragon } from '@useparagon/connect';
 import ConnectSDK from "@useparagon/connect/ConnectSDK";
 import { useCallback, useEffect, useState } from "react";
+import { mutate } from 'swr';
 
 declare global {
-  interface Window {
-    paragon: typeof paragon;
-  }
+	interface Window {
+		paragon: typeof paragon;
+	}
 }
 
 let paragonConnect: ConnectSDK | undefined;
 export default function useParagon(paragonUserToken: string) {
-  useEffect(() => {
-    if (typeof window !== "undefined" && typeof paragonConnect === "undefined") {
-      paragonConnect = new ConnectSDK();
-    }
+	useEffect(() => {
+		if (typeof window !== "undefined" && typeof paragonConnect === "undefined") {
+			paragonConnect = new ConnectSDK();
+		}
 
-    if (!window.paragon) {
-      window.paragon = paragon;
-      paragon.setHeadless(true);
-    }
-  }, []);
+		if (!window.paragon) {
+			window.paragon = paragon;
+			paragon.setHeadless(true);
+		}
+	}, []);
 
-  const [user, setUser] = useState(paragonConnect ? paragonConnect.getUser() : null);
-  const [error, setError] = useState();
+	const [user, setUser] = useState(paragonConnect ? paragonConnect.getUser() : null);
+	const [error, setError] = useState();
 
-  const updateUser = useCallback(async () => {
-    if (!paragonConnect) {
-      return;
-    }
-    const authedUser = paragonConnect.getUser();
-    if (authedUser.authenticated) {
-      setUser({ ...authedUser });
-    }
-  }, []);
+	const updateUser = useCallback(async () => {
+		mutate('user');
+		mutate('agent/actions');
+		if (!paragonConnect) {
+			return;
+		}
 
-  // Listen for account state changes
-  useEffect(() => {
-    // @ts-expect-error event type
-    paragonConnect.subscribe("onIntegrationInstall", updateUser);
-    // @ts-expect-error event type
-    paragonConnect.subscribe("onIntegrationUninstall", updateUser);
-    return () => {
-      // @ts-expect-error event type
-      paragonConnect.unsubscribe("onIntegrationInstall", updateUser);
-      // @ts-expect-error event type
-      paragonConnect.unsubscribe("onIntegrationUninstall", updateUser);
-    };
-  }, []);
+		const authedUser = paragonConnect.getUser();
+		if (authedUser.authenticated) {
+			setUser({ ...authedUser });
+		}
+	}, []);
 
-  useEffect(() => {
-    if (!error) {
-      paragon.authenticate(
-        process.env.NEXT_PUBLIC_PARAGON_PROJECT_ID!,
-        paragonUserToken
-      ).then(() => {
-        if (paragonConnect) {
-          paragonConnect.authenticate(
-            process.env.NEXT_PUBLIC_PARAGON_PROJECT_ID!,
-            paragonUserToken
-          )
-            .then(updateUser)
-            .catch(setError);
-        }
-      }).catch(setError);
-    }
-  }, [error, paragonUserToken]);
+	// Listen for account state changes
+	useEffect(() => {
+		// @ts-expect-error event type
+		paragonConnect.subscribe("onIntegrationInstall", updateUser);
+		// @ts-expect-error event type
+		paragonConnect.subscribe("onIntegrationUninstall", updateUser);
+		return () => {
+			// @ts-expect-error event type
+			paragonConnect.unsubscribe("onIntegrationInstall", updateUser);
+			// @ts-expect-error event type
+			paragonConnect.unsubscribe("onIntegrationUninstall", updateUser);
+		};
+	}, []);
 
-  return {
-    paragonConnect,
-    user,
-    error,
-    updateUser,
-  };
+	useEffect(() => {
+		if (!error) {
+			paragon.authenticate(
+				process.env.NEXT_PUBLIC_PARAGON_PROJECT_ID!,
+				paragonUserToken
+			).then(() => {
+				if (paragonConnect) {
+					paragonConnect.authenticate(
+						process.env.NEXT_PUBLIC_PARAGON_PROJECT_ID!,
+						paragonUserToken
+					)
+						.then(updateUser)
+						.catch(setError);
+				}
+			}).catch(setError);
+		}
+	}, [error, paragonUserToken]);
+
+	return {
+		paragonConnect,
+		user,
+		error,
+		updateUser,
+	};
 }
 
 type FieldOptionsResponse = Awaited<ReturnType<typeof paragon.getFieldOptions>>;
 
 const fieldOptionsInitialData: FieldOptionsResponse = {
-  data: [],
-  nestedData: [],
-  nextPageCursor: null,
+	data: [],
+	nestedData: [],
+	nextPageCursor: null,
 };
 
 export function useFieldOptions({
-  integration,
-  sourceType,
-  search,
-  cursor,
-  parameters = [],
-  enabled = true,
+	integration,
+	sourceType,
+	search,
+	cursor,
+	parameters = [],
+	enabled = true,
 }: {
-  integration: string;
-  sourceType: string;
-  search?: string;
-  cursor?: string | number | false;
-  parameters?: { cacheKey: string; value: string | undefined }[];
-  enabled?: boolean;
+	integration: string;
+	sourceType: string;
+	search?: string;
+	cursor?: string | number | false;
+	parameters?: { cacheKey: string; value: string | undefined }[];
+	enabled?: boolean;
 }) {
-  return useQuery({
-    enabled: enabled,
-    queryKey: ['fieldOptions', integration, sourceType, search, parameters],
-    queryFn: () => {
-      if (sourceType) {
-        return paragon.getFieldOptions({
-          integration,
-          action: sourceType,
-          search,
-          cursor,
-          parameters: parameters.map((parameter) => {
-            return {
-              key: parameter.cacheKey,
-              source: {
-                type: 'VALUE',
-                value: parameter.value,
-              },
-            };
-          }),
-        });
-      }
-      return fieldOptionsInitialData;
-    },
-    initialData: fieldOptionsInitialData,
-  });
+	return useQuery({
+		enabled: enabled,
+		queryKey: ['fieldOptions', integration, sourceType, search, parameters],
+		queryFn: () => {
+			if (sourceType) {
+				return paragon.getFieldOptions({
+					integration,
+					action: sourceType,
+					search,
+					cursor,
+					parameters: parameters.map((parameter) => {
+						return {
+							key: parameter.cacheKey,
+							source: {
+								type: 'VALUE',
+								value: parameter.value,
+							},
+						};
+					}),
+				});
+			}
+			return fieldOptionsInitialData;
+		},
+		initialData: fieldOptionsInitialData,
+	});
 }
 
 export function useDataSourceOptions<T>(
-  integration: string,
-  sourceType: string
+	integration: string,
+	sourceType: string
 ) {
-  return useQuery({
-    queryKey: ['comboInputOptions', integration, sourceType],
-    queryFn: () => {
-      return paragon.getDataSourceOptions(integration, sourceType) as T;
-    },
-  });
+	return useQuery({
+		queryKey: ['comboInputOptions', integration, sourceType],
+		queryFn: () => {
+			return paragon.getDataSourceOptions(integration, sourceType) as T;
+		},
+	});
 }
