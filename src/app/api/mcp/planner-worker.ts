@@ -1,5 +1,5 @@
 import { openai } from '@ai-sdk/openai';
-import { generateText, experimental_createMCPClient, AsyncIterableStream, generateObject, InferUIMessageChunk, ModelMessage, stepCountIs, streamText, UIMessage } from 'ai';
+import { generateText, experimental_createMCPClient, AsyncIterableStream, generateObject, InferUIMessageChunk, ModelMessage, stepCountIs, streamText, UIMessage, streamObject } from 'ai';
 import { z } from 'zod';
 import { SSEClientTransport } from '@modelcontextprotocol/sdk/client/sse.js';
 
@@ -7,13 +7,16 @@ type WorkerResponse = {
 	streamResult: AsyncIterableStream<InferUIMessageChunk<UIMessage>>;
 }
 
-export async function planWork(integrations: Array<string>, messages: Array<ModelMessage>, userId: string) {
+export async function planWork(integrations: Array<string>, messages: Array<ModelMessage>) {
 	const objectPrompt: ModelMessage = {
 		role: "user",
-		content: `Decide if an integration is needed 
-			and if needed, what integrations are involved to complete the task. 
+		content: `Decide if an integration is needed and if needed, 
+			what integrations are involved to complete the task. 
+
 			In the integrationSpecificPrompt, reword the request to only have 
-			information that is relevant to the specific integration`
+			information that is relevant to the specific integration.
+
+			Describe the plan concisely.`
 	}
 	const objectMessages = [...messages, objectPrompt];
 	const { object: integrationPlan } = await generateObject({
@@ -21,12 +24,19 @@ export async function planWork(integrations: Array<string>, messages: Array<Mode
 		schema: z.object({
 			integrations: integrations.length > 0 ? z.array(z.enum(integrations as [string, ...string[]])) : z.array(z.string()),
 			integrationSpecificPrompt: z.array(z.string()),
+			plan: z.string(),
 		}),
 		system: `You have access to these integrations: ${integrations.join()}`,
 		messages: objectMessages
 	});
-	console.log("THE PLAN: ", integrationPlan);
+	return integrationPlan
+}
 
+export async function executeWork(
+	integrationPlan: { integrations: Array<string>, integrationSpecificPrompt: Array<string>, plan: string },
+	userId: string,
+	messages: Array<ModelMessage>,
+) {
 	const sseTransport = new SSEClientTransport(
 		new URL(`${process.env.MCP_SERVER!}/sse?user=${userId}`),
 	);
@@ -88,7 +98,6 @@ export async function planWork(integrations: Array<string>, messages: Array<Mode
 	}
 
 	return {
-		plan: integrationPlan,
 		workerResponses: workerResponses
 	};
 }
