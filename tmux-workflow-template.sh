@@ -18,7 +18,7 @@ then
     tmux send-keys -t 'opencode' 'opencode' C-m
 
     tmux new-window -t $SESSION:3 -n 'mcp'
-    tmux send-keys -t 'mcp' 'cd ../actionkit-playground-mcp' C-m 'npm run start' C-m
+    tmux send-keys -t 'mcp' 'cd ../actions-playground-mcp' C-m 'npm run start' C-m
 fi
 
 # Attach Session, on the Main window

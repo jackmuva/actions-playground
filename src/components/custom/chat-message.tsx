@@ -54,17 +54,3 @@ export const ChatMessage = ({ message, part }:
 		);
 	}
 }
-
-// {part.output.content.length > 0 ? (
-// 					part.output.content.map((message: { type: string, text: string }, i: number) => {
-// 						return (
-// 							<div key={i} className="markdown flex flex-col space-y-2">
-// 								<ReactMarkdown>
-// 									{message.text}
-// 								</ReactMarkdown>
-// 							</div>
-//
-// 						)
-// 					})
-// 				) : (<></>)}
-

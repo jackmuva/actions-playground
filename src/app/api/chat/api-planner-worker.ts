@@ -1,7 +1,6 @@
 import { openai } from '@ai-sdk/openai';
-import { generateText, experimental_createMCPClient, AsyncIterableStream, generateObject, InferUIMessageChunk, ModelMessage, stepCountIs, streamText, UIMessage, streamObject } from 'ai';
+import { AsyncIterableStream, generateObject, InferUIMessageChunk, ModelMessage, stepCountIs, streamText, UIMessage, tool, jsonSchema } from 'ai';
 import { z } from 'zod';
-import { SSEClientTransport } from '@modelcontextprotocol/sdk/client/sse.js';
 
 type WorkerResponse = {
 	streamResult: AsyncIterableStream<InferUIMessageChunk<UIMessage>>;
@@ -16,7 +15,6 @@ export async function planWork(integrations: Array<string>, messages: Array<Mode
 			In the integrationSpecificPrompt, reword the request to only have 
 			information that is relevant to the specific integration. One 
 			integrationSpecificPrompt per integration.`
-
 	}
 	const objectMessages = [...messages, objectPrompt];
 	const { object: integrationPlan } = await generateObject({
@@ -32,23 +30,11 @@ export async function planWork(integrations: Array<string>, messages: Array<Mode
 }
 
 export async function executeWork(
-	integrationPlan: { integrations: Array<string>, integrationSpecificPrompt: Array<string> },
-	userId: string,
+	tools: any,
+	integrationPlan: { integrations: Array<string>, integrationSpecificPrompt: Array<string>, },
 	messages: Array<ModelMessage>,
+	paragonUserToken: string,
 ) {
-	console.log("executing work...");
-	const sseTransport = new SSEClientTransport(
-		new URL(`${process.env.MCP_SERVER!}/sse?user=${userId}`),
-	);
-	console.log("SSE_TRANSPORT...", sseTransport);
-	const mcpClient = await experimental_createMCPClient({
-		transport: sseTransport,
-	});
-	console.log("MCP CLIENT...", mcpClient);
-
-	const tools = await mcpClient.tools();
-	console.log("RECEIVED TOOLS");
-
 	let workerResponses: Array<WorkerResponse> = [];
 	if (Object.keys(tools).length === 0 || integrationPlan.integrations.length === 0) {
 		const result = streamText({
@@ -63,12 +49,45 @@ export async function executeWork(
 		workerResponses = await Promise.all(
 			integrationPlan.integrations.map(async (integration, i) => {
 				const toolsForIntegration = Object.fromEntries(
-					Object.keys(tools)
-						.filter((tool) => integration === tool.split("_")[0].toLowerCase())
-						.map((tool) => [tool, tools[tool]])
-				);
-
-				const revisedMessages: Array<ModelMessage> = [...messages];
+					tools[integration.toLowerCase()]?.map((toolFunction:
+						{ type: string, function: { name: string, title: string, parameters: any } }
+					) => {
+						return [toolFunction.function.name, tool({
+							description: toolFunction.function.title,
+							inputSchema: jsonSchema(toolFunction.function.parameters),
+							execute: async (params: any) => {
+								console.log(`EXECUTING TOOL: ${toolFunction.function.name}`);
+								console.log(`Tool params:`, params);
+								try {
+									const response = await fetch(
+										`https://actionkit.useparagon.com/projects/${process.env.NEXT_PUBLIC_PARAGON_PROJECT_ID}/actions`,
+										{
+											method: "POST",
+											body: JSON.stringify({
+												action: toolFunction.function.name,
+												parameters: params,
+											}),
+											headers: {
+												Authorization: `Bearer ${paragonUserToken}`,
+												"Content-Type": "application/json",
+											},
+										}
+									);
+									const output = await response.json();
+									if (!response.ok) {
+										throw new Error(JSON.stringify(output, null, 2));
+									}
+									return output;
+								} catch (err) {
+									if (err instanceof Error) {
+										return { error: { message: err.message } };
+									}
+									return err;
+								}
+							}
+						})];
+					})
+				); const revisedMessages: Array<ModelMessage> = [...messages];
 				revisedMessages.pop();
 				revisedMessages.push({
 					role: 'user',

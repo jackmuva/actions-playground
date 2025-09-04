@@ -29,6 +29,7 @@ export default function useParagon(paragonUserToken: string) {
 	const updateUser = useCallback(async () => {
 		mutate('user');
 		mutate('agent/actions');
+		mutate('tools');
 		if (!paragonConnect) {
 			return;
 		}
