@@ -9,8 +9,8 @@ type WorkerResponse = {
 export async function planWork(integrations: Array<string>, messages: Array<ModelMessage>) {
 	const objectPrompt: ModelMessage = {
 		role: "user",
-		content: `Decide if an integration is needed and if needed, 
-			what integrations are involved to complete the task. 
+		content: `Decide what integrations are needed to complete the task. 
+			For generic requests, do not include any integrations.
 
 			In the integrationSpecificPrompt, reword the request to only have 
 			information that is relevant to the specific integration. One 
