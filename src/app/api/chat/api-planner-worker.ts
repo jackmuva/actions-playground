@@ -48,46 +48,50 @@ export async function executeWork(
 	} else {
 		workerResponses = await Promise.all(
 			integrationPlan.integrations.map(async (integration, i) => {
-				const toolsForIntegration = Object.fromEntries(
-					tools[integration.toLowerCase()]?.map((toolFunction:
-						{ type: string, function: { name: string, title: string, parameters: any } }
-					) => {
-						return [toolFunction.function.name, tool({
-							description: toolFunction.function.title,
-							inputSchema: jsonSchema(toolFunction.function.parameters),
-							execute: async (params: any) => {
-								console.log(`EXECUTING TOOL: ${toolFunction.function.name}`);
-								console.log(`Tool params:`, params);
-								try {
-									const response = await fetch(
-										`https://actionkit.useparagon.com/projects/${process.env.NEXT_PUBLIC_PARAGON_PROJECT_ID}/actions`,
-										{
-											method: "POST",
-											body: JSON.stringify({
-												action: toolFunction.function.name,
-												parameters: params,
-											}),
-											headers: {
-												Authorization: `Bearer ${paragonUserToken}`,
-												"Content-Type": "application/json",
-											},
+				let toolsForIntegration = {};
+				if (integration.toLowerCase() in tools) {
+					toolsForIntegration = Object.fromEntries(
+						tools[integration.toLowerCase()]?.map((toolFunction:
+							{ type: string, function: { name: string, title: string, parameters: any } }
+						) => {
+							return [toolFunction.function.name, tool({
+								description: toolFunction.function.title,
+								inputSchema: jsonSchema(toolFunction.function.parameters),
+								execute: async (params: any) => {
+									console.log(`EXECUTING TOOL: ${toolFunction.function.name}`);
+									console.log(`Tool params:`, params);
+									try {
+										const response = await fetch(
+											`https://actionkit.useparagon.com/projects/${process.env.NEXT_PUBLIC_PARAGON_PROJECT_ID}/actions`,
+											{
+												method: "POST",
+												body: JSON.stringify({
+													action: toolFunction.function.name,
+													parameters: params,
+												}),
+												headers: {
+													Authorization: `Bearer ${paragonUserToken}`,
+													"Content-Type": "application/json",
+												},
+											}
+										);
+										const output = await response.json();
+										if (!response.ok) {
+											throw new Error(JSON.stringify(output, null, 2));
 										}
-									);
-									const output = await response.json();
-									if (!response.ok) {
-										throw new Error(JSON.stringify(output, null, 2));
+										return output;
+									} catch (err) {
+										if (err instanceof Error) {
+											return { error: { message: err.message } };
+										}
+										return err;
 									}
-									return output;
-								} catch (err) {
-									if (err instanceof Error) {
-										return { error: { message: err.message } };
-									}
-									return err;
 								}
-							}
-						})];
-					})
-				); const revisedMessages: Array<ModelMessage> = [...messages];
+							})];
+						})
+					);
+				}
+				const revisedMessages: Array<ModelMessage> = [...messages];
 				revisedMessages.pop();
 				revisedMessages.push({
 					role: 'user',
@@ -105,9 +109,7 @@ export async function executeWork(
 					IMPORTANT: You MUST use the available tools to help with the user's request.
 					Do not just describe what you would do - actually call the tools! Do NOT forget inputs.
 
-					If the latest tool output directs user to enable the integration via a setup link, 
-					return the setup link in markdown format. Once an integration is setup, return tool 
-					outputs and not the setup link`,
+					If there are no tools for this integration, prompt user to connect integration in the sidebar.`,
 					messages: revisedMessages,
 					stopWhen: stepCountIs(5),
 					tools: toolsForIntegration,

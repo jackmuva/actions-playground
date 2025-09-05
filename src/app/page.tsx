@@ -15,12 +15,13 @@ export default async function Welcome() {
 		<div className="min-h-dvh w-dvw flex flex-col items-center justify-center relative">
 			<Image src="/playground.png" alt="test" width={1000000} height={1000000}
 				className="min-h-dvh left-0 top-0 absolute blur-xs brightness-75" />
-			<div className="w-fit flex flex-col items-center p-20 space-y-6 rounded-sm 
-				border bg-radial z-20 shadow-xl">
+			<div className="w-fit flex flex-col items-center p-16 space-y-6 rounded-sm 
+				border bg-background z-20 shadow-xl">
 				<h1 className="font-bold text-5xl">
 					ActionKit Playground
 				</h1>
-				<p className="text-foreground-muted max-w-[850px] text-xl text-center">
+				<p className="text-foreground-muted max-w-[850px] text-xl text-center
+					mb-12 ">
 					Explore <strong>how actions work</strong> and check out a
 					few <strong>popular implementations</strong> of ActionKit
 				</p>
