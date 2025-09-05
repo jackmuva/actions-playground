@@ -14,6 +14,7 @@ export default function Chat({ session }: { session: { paragonUserToken?: string
 		transport: new DefaultChatTransport({
 			api: '/api/chat',
 			// api: '/api/mcp',
+			// api: '/api/parallel-workers'
 		}),
 	});
 	const messageWindowRef = useRef<HTMLDivElement>(null);
@@ -67,12 +68,12 @@ export default function Chat({ session }: { session: { paragonUserToken?: string
 						)
 					)}
 					{status === 'submitted' ? (
-						<div className='animate-pulse'>
+						<div className='p-2 animate-pulse'>
 							hang on a sec, agent is thinking...
 						</div>
 					) : (
 						status === 'streaming' ? (
-							<div className='animate-pulse'>
+							<div className='p-2 animate-pulse'>
 								generating response...
 							</div>
 						) : (

@@ -1,7 +1,7 @@
 import { userWithToken } from '@/lib/auth';
-import { UIMessage, convertToModelMessages, createUIMessageStream, createUIMessageStreamResponse } from 'ai';
+import { UIMessage, convertToModelMessages, stepCountIs, streamText, tool, jsonSchema } from 'ai';
 import { NextResponse } from 'next/server';
-import { planWork, executeWork } from './api-planner-worker';
+import { openai } from '@ai-sdk/openai';
 
 export const maxDuration = 180;
 
@@ -18,43 +18,74 @@ export async function POST(req: Request) {
 	const lastUserMessage = messages.filter(m => m.role === 'user').pop();
 	const metadata = lastUserMessage?.metadata as any;
 
-
-	const response = createUIMessageStreamResponse({
-		status: 200,
-		statusText: "OK",
-		stream: createUIMessageStream({
-			execute({ writer }) {
-				return (async () => {
-					const integrationPlan = await planWork(metadata.integrations, modelMessages);
-					console.log("THE PLAN: ", integrationPlan);
-					const { workerResponses } = await executeWork(metadata.tools, integrationPlan, modelMessages, paragonUserToken);
-					try {
-						for (const workerResponse of workerResponses) {
-							for await (const chunk of workerResponse.streamResult) {
-								writer.write(chunk);
+	if (Object.keys(metadata.tools).length === 0) {
+		const result = streamText({
+			model: openai('gpt-4.1-nano'),
+			system: 'you are a friendly agent',
+			messages: modelMessages
+		});
+		return result.toUIMessageStreamResponse();
+	} else {
+		const tools = Object.fromEntries(
+			Object.keys(metadata.tools).flatMap((integration) => {
+				return metadata.tools[integration]?.map((toolFunction:
+					{ type: string, function: { name: string, title: string, parameters: any } }
+				) => {
+					return [toolFunction.function.name, tool({
+						description: toolFunction.function.title,
+						inputSchema: jsonSchema(toolFunction.function.parameters),
+						execute: async (params: any) => {
+							console.log(`EXECUTING TOOL: ${toolFunction.function.name}`);
+							console.log(`Tool params:`, params);
+							try {
+								const response = await fetch(
+									`https://actionkit.useparagon.com/projects/${process.env.NEXT_PUBLIC_PARAGON_PROJECT_ID}/actions`,
+									{
+										method: "POST",
+										body: JSON.stringify({
+											action: toolFunction.function.name,
+											parameters: params,
+										}),
+										headers: {
+											Authorization: `Bearer ${paragonUserToken}`,
+											"Content-Type": "application/json",
+										},
+									}
+								);
+								const output = await response.json();
+								if (!response.ok) {
+									throw new Error(JSON.stringify(output, null, 2));
+								}
+								return output;
+							} catch (err) {
+								if (err instanceof Error) {
+									return { error: { message: err.message } };
+								}
+								return err;
 							}
 						}
-					} catch (error) {
-						console.error('Error processing worker streams:', error);
-						writer.write({
-							type: 'text-delta',
-							delta: `Error processing streams: ${error instanceof Error ? error.message : 'Unknown error'}`,
-							id: 'error-message'
-						});
-					}
-				})();
-			},
-			onError: (error: unknown) => {
-				//@ts-expect-error from ai-sdk docs
-				return `Custom error: ${error.message}`
-			},
-			originalMessages: messages,
-			onFinish: ({ messages }) => {
-				console.log('Stream finished with messages:', messages);
-			},
-		})
+					})];
+				}) || []
+			})
+		)
 
-	});
-	return response;
+		const result = streamText({
+			model: openai('gpt-5-nano'),
+			system: `You are an agent with 3rd-party tools 
+
+				IMPORTANT: You MUST use the available tools to help with the user's request.
+				Do not just describe what you would do - actually call the tools! Do NOT forget inputs.
+
+				If there are no tools for the requested integration, 
+				prompt user to connect integration within this application - ActionKit Playground.
+
+				Be as concise as possible in your answers.`,
+			messages: modelMessages,
+			stopWhen: stepCountIs(5),
+			tools: tools,
+		});
+		return result.toUIMessageStreamResponse();
+	}
 }
+
 

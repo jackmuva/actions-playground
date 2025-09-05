@@ -88,7 +88,9 @@ export async function executeWork(
 
 					If the latest tool output directs user to enable the integration via a setup link, 
 					return the setup link in markdown format. Once an integration is setup, return tool 
-					outputs and not the setup link`,
+					outputs and not the setup link.
+
+					Be as concise as possible in your answers.`,
 					messages: revisedMessages,
 					stopWhen: stepCountIs(5),
 					tools: toolsForIntegration,

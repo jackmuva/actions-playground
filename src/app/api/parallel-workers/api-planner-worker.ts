@@ -109,7 +109,10 @@ export async function executeWork(
 					IMPORTANT: You MUST use the available tools to help with the user's request.
 					Do not just describe what you would do - actually call the tools! Do NOT forget inputs.
 
-					If there are no tools for this integration, prompt user to connect integration in the sidebar.`,
+					If there are no tools for the requested integration, 
+					prompt user to connect integration within this application - ActionKit Playground.
+
+					 Be as concise as possible in your answers.`,
 					messages: revisedMessages,
 					stopWhen: stepCountIs(5),
 					tools: toolsForIntegration,
