@@ -1,11 +1,9 @@
 "use client";
-import { useEffect } from 'react';
 import useParagon from "@/lib/hooks";
 import { Info } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import useSWR from "swr";
 import { ActionsSidebarTile } from "./actions-sidebar-tile";
-import { IntegrationInstallEvent, PortalCloseEvent } from '@useparagon/connect';
 
 export default function ActionsSidebar({ session }: { session: { paragonUserToken?: string } }) {
 	const { paragonConnect } = useParagon(session.paragonUserToken ?? "");

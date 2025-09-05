@@ -1,5 +1,5 @@
 import { openai } from '@ai-sdk/openai';
-import { generateText, experimental_createMCPClient, AsyncIterableStream, generateObject, InferUIMessageChunk, ModelMessage, stepCountIs, streamText, UIMessage, streamObject } from 'ai';
+import { experimental_createMCPClient, AsyncIterableStream, generateObject, InferUIMessageChunk, ModelMessage, stepCountIs, streamText, UIMessage } from 'ai';
 import { z } from 'zod';
 import { SSEClientTransport } from '@modelcontextprotocol/sdk/client/sse.js';
 

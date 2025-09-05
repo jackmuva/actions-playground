@@ -1,5 +1,5 @@
 import { userWithToken } from '@/lib/auth';
-import { TextUIPart, UIMessage, convertToModelMessages, createUIMessageStream, createUIMessageStreamResponse } from 'ai';
+import { UIMessage, convertToModelMessages, createUIMessageStream, createUIMessageStreamResponse } from 'ai';
 import { NextResponse } from 'next/server';
 import { planWork, executeWork } from './api-planner-worker';
 
