@@ -15,15 +15,6 @@ pnpm dev
 bun dev
 ```
 
-## Todos
-- different auth flow?
-    - create dummy sidebar and actions for unauthed users
-    - auth when dummy actions
-- pick apps with lenient dev credentials
-- confirm correct scopes
-- send new signups to webhook url
-- tooltips for tabs
-
 ## Playground Goals
 ### Our goal: 
 Have prospects and customers understand **what ActionKit is and what the value is**. We want to give them a frictionless experience 
