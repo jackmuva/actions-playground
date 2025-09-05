@@ -10,7 +10,10 @@ export const GET = handleAuth({
 			);
 			const req = await fetch(process.env.WEBHOOK_URL!, {
 				method: "POST",
-				body: JSON.stringify({ user: data.user.email }),
+				body: JSON.stringify({
+					email: data.user.email,
+					name: `${data.user.firstName} ${data.user.lastName}`
+				}),
 				headers: { 'Content-Type': "application/json" }
 			});
 			console.log("webhook completed with: ", req.status);

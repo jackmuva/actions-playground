@@ -1,10 +1,10 @@
 import { Button } from "@/components/ui/button";
-import { withAuth, getSignInUrl } from "@workos-inc/authkit-nextjs";
+import { withAuth, getSignUpUrl } from "@workos-inc/authkit-nextjs";
 import { redirect, RedirectType } from "next/navigation";
 import Image from "next/image";
 
 export default async function Welcome() {
-	const signUpUrl = await getSignInUrl();
+	const signUpUrl = await getSignUpUrl();
 	const { user } = await withAuth();
 
 	if (user) {
