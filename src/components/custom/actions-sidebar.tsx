@@ -36,7 +36,7 @@ export default function ActionsSidebar({ session }: { session: { paragonUserToke
 	});
 
 	return (
-		<div className="w-96 mr-2 max-h-full overflow-y-scroll">
+		<div className="w-96 max-h-full overflow-y-auto mr-2">
 			<div className="flex flex-col space-y-0 items-start w-full mb-4">
 				<div className="flex space-x-1 items-center">
 					<h1 className="font-semibold ">
@@ -89,7 +89,13 @@ export default function ActionsSidebar({ session }: { session: { paragonUserToke
 				)}
 			</div>
 			<p className="text-sm text-neutral-500 text-wrap text-center">
-				Visit our docs for our full list of supported ActionKit integrations
+				Visit&nbsp;
+				<a href="https://docs.useparagon.com/actionkit/overview"
+					target="_blank"
+					className="text-indigo-700 hover:text-indigo-500 font-semibold">
+					our docs
+				</a>
+				&nbsp;for our full list of supported ActionKit integrations
 			</p>
 		</div>
 	);

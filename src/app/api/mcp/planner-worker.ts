@@ -10,22 +10,61 @@ type WorkerResponse = {
 export async function planWork(integrations: Array<string>, messages: Array<ModelMessage>) {
 	const objectPrompt: ModelMessage = {
 		role: "user",
-		content: `Decide if an integration is needed and if needed, 
-			what integrations are involved to complete the task. 
+		content: `You are a task planning assistant. Analyze the user's request and determine which integrations (if any) are needed to complete the task.
 
-			In the integrationSpecificPrompt, reword the request to only have 
-			information that is relevant to the specific integration. One 
-			integrationSpecificPrompt per integration.`
+TASK ANALYSIS:
+1. Read the user's request carefully
+2. Identify what the user wants to accomplish
+3. Determine if any of the available integrations can help with this task
+4. If integrations are needed, select the most relevant ones
+5. Create specific, focused prompts for each selected integration
+
+INTEGRATION SELECTION RULES:
+- Only select integrations that are directly relevant to the user's request
+- If no integrations are needed, return an empty array
+- Prefer fewer, more targeted integrations over many generic ones
+- Each integration should serve a distinct purpose in completing the task
+
+PROMPT CREATION RULES:
+- Create one integrationSpecificPrompt for each selected integration
+- Each prompt should contain ONLY the information relevant to that specific integration
+- Remove any context that doesn't apply to the integration
+- Make the prompt clear and actionable for the integration
+- Use the same language and tone as the original request
+
+EXAMPLE:
+User: "Send a message to John on Slack and create a calendar event for our meeting tomorrow"
+- integrations: ["slack", "calendar"]
+- integrationSpecificPrompt: ["Send a message to John on Slack", "Create a calendar event for our meeting tomorrow"]
+
+Return your analysis in the required JSON format.`
 
 	}
 	const objectMessages = [...messages, objectPrompt];
 	const { object: integrationPlan } = await generateObject({
 		model: openai('gpt-5-nano'),
 		schema: z.object({
-			integrations: integrations.length > 0 ? z.array(z.enum(integrations as [string, ...string[]])) : z.array(z.string()),
-			integrationSpecificPrompt: z.array(z.string()),
+			integrations: integrations.length > 0 
+				? z.array(z.enum(integrations as [string, ...string[]])).min(0).max(5).describe("Array of integration names needed for the task")
+				: z.array(z.string()).min(0).max(5).describe("Array of integration names needed for the task"),
+			integrationSpecificPrompt: z.array(z.string())
+				.min(0)
+				.max(5)
+				.describe("Array of specific prompts for each integration, one per integration")
+				.refine((prompts) => prompts.length === 0 || prompts.every(prompt => prompt.trim().length > 0), {
+					message: "All integration-specific prompts must be non-empty strings"
+				}),
 		}),
-		system: `You have access to these integrations: ${integrations.join()}`,
+		system: `You are an expert task planner that analyzes user requests and determines which integrations are needed to complete them.
+
+AVAILABLE INTEGRATIONS: ${integrations.join(', ')}
+
+Your job is to:
+1. Understand what the user wants to accomplish
+2. Identify which integrations can help achieve their goal
+3. Create focused, integration-specific prompts that contain only relevant information
+
+Be precise and selective - only recommend integrations that directly contribute to completing the user's request.`,
 		messages: objectMessages
 	});
 	return integrationPlan

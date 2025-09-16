@@ -180,7 +180,7 @@ export default function ActionTester({ session }: { session: { paragonUserToken?
 						</TooltipContent>
 					</Tooltip>
 				</div>
-				<div className="flex flex-col gap-6 overflow-x-scroll max-h-full border border-neutral-200 rounded-md p-2">
+				<div className="flex flex-col gap-6 overflow-x-auto max-h-full border border-neutral-200 rounded-md p-2">
 					<div className="flex flex-col gap-2 ">
 						<ComboboxField
 							id="integration"
@@ -332,7 +332,7 @@ export default function ActionTester({ session }: { session: { paragonUserToken?
 					<div className="w-full flex flex-col gap-2 h-full">
 						{actionData || actionError || actionIsLoading ? (
 							<div className="flex flex-col gap-2 h-full">
-								<pre className="text-xs p-2 bg-neutral-100 rounded-md overflow-x-scroll">
+								<pre className="text-xs p-2 bg-neutral-100 rounded-md overflow-x-auto">
 									POST https://actionkit.useparagon.com/projects/PARAGON_PROJECT_ID/actions,<br />
 									headers: &#123;<br />
 									&nbsp;Authorization: &apos;Bearer PARAGON_SIGNED_TOKEN&apos;,<br />
@@ -375,7 +375,7 @@ export default function ActionTester({ session }: { session: { paragonUserToken?
 				</div>
 				{actionData || actionError ? (
 					<div className="flex flex-col gap-2 h-full">
-						<pre className="text-xs p-2 bg-neutral-100 rounded-md overflow-x-scroll">
+						<pre className="text-xs p-2 bg-neutral-100 rounded-md overflow-x-auto">
 							{actionData
 								? JSON.stringify(actionData, null, 2)
 								: actionError
