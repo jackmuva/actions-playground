@@ -70,7 +70,7 @@ export async function POST(req: Request) {
 		)
 
 		const result = streamText({
-			model: openai('gpt-5-nano'),
+			model: openai('gpt-4o'),
 			system: `You are an agent with 3rd-party tools 
 
 				IMPORTANT: You MUST use the available tools to help with the user's request.
