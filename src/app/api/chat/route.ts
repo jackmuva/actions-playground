@@ -20,7 +20,7 @@ export async function POST(req: Request) {
 
 	if (Object.keys(metadata.tools).length === 0) {
 		const result = streamText({
-			model: openai('gpt-4.1-nano'),
+			model: openai('gpt-4o'),
 			system: 'you are a friendly agent',
 			messages: modelMessages
 		});
@@ -29,10 +29,10 @@ export async function POST(req: Request) {
 		const tools = Object.fromEntries(
 			Object.keys(metadata.tools).flatMap((integration) => {
 				return metadata.tools[integration]?.map((toolFunction:
-					{ type: string, function: { name: string, title: string, parameters: any } }
+					{ type: string, function: { name: string, description: string, parameters: any } }
 				) => {
 					return [toolFunction.function.name, tool({
-						description: toolFunction.function.title,
+						description: toolFunction.function.description,
 						inputSchema: jsonSchema(toolFunction.function.parameters),
 						execute: async (params: any) => {
 							console.log(`EXECUTING TOOL: ${toolFunction.function.name}`);

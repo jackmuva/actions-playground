@@ -12,9 +12,9 @@ export default function Chat({ session }: { session: { paragonUserToken?: string
 	const [input, setInput] = useState('');
 	const { messages, sendMessage, status } = useChat({
 		transport: new DefaultChatTransport({
-			api: '/api/chat',
+			// api: '/api/chat',
 			// api: '/api/mcp',
-			// api: '/api/parallel-workers'
+			api: '/api/tool-filter'
 		}),
 	});
 	const messageWindowRef = useRef<HTMLDivElement>(null);
