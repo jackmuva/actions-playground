@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import { UserDropdown } from "@/components/custom/user-dropdown";
-import { BookOpen, ClipboardPen, HatGlasses, WandSparkles } from "lucide-react";
+import { BookOpen, ClipboardPen, HatGlasses, WandSparkles, Workflow } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { Button } from "../ui/button";
@@ -71,6 +71,22 @@ export function Navbar({ session }: { session: { user: any, paragonUserToken?: s
 						</p>
 					</TooltipContent>
 				</Tooltip>
+				<Tooltip>
+					<TooltipTrigger>
+						<a href="/workflow" className={`${pathname === "/workflow" ? "font-semibold underline" : ""} 
+                                                flex items-center space-x-1 hover:underline`}>
+							<Workflow size={18} />
+							<p>Workflow</p>
+						</a>
+					</TooltipTrigger>
+
+					<TooltipContent>
+						<p className="text-wrap text-center max-w-48">
+							Example implementation of ActionKit: embedded workflow builder use case
+						</p>
+					</TooltipContent>
+				</Tooltip>
+
 			</div>
 		</div >
 	)
