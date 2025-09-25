@@ -1,12 +1,13 @@
 "use client";
 import useParagon from "@/lib/hooks";
-import { Info } from "lucide-react";
-import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import useSWR from "swr";
-import { ActionsSidebarTile } from "./actions-sidebar-tile";
-import { SidebarLoading } from "./sidebar-loading";
+import { Info } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../../ui/tooltip";
+import { ActionsSidebarTile } from "../action/actions-sidebar-tile";
+import { SidebarLoading } from "../sidebar-loading";
+import { WorkflowSidebarTile } from "./workflow-sidebar-tile";
 
-export default function ActionsSidebar({ session }: { session: { paragonUserToken?: string } }) {
+export default function WorkflowSidebar({ session }: { session: { paragonUserToken?: string } }) {
 	const { paragonConnect } = useParagon(session.paragonUserToken ?? "");
 	const integrations = paragonConnect?.getIntegrationMetadata();
 
@@ -41,7 +42,7 @@ export default function ActionsSidebar({ session }: { session: { paragonUserToke
 			<div className="flex flex-col space-y-0 items-start w-full mb-4">
 				<div className="flex space-x-1 items-center">
 					<h1 className="font-semibold ">
-						Sources
+						Integration Nodes
 					</h1>
 					<Tooltip>
 						<TooltipTrigger>
@@ -49,7 +50,7 @@ export default function ActionsSidebar({ session }: { session: { paragonUserToke
 						</TooltipTrigger>
 						<TooltipContent>
 							<p className="text-sm text-wrap">
-								Paragon fully manages integration auth for your end-users.
+								ActionKit provides nodes and descriptions for popular actions per integration
 							</p>
 						</TooltipContent>
 					</Tooltip>
@@ -74,7 +75,7 @@ export default function ActionsSidebar({ session }: { session: { paragonUserToke
 							return a.type < b.type ? -1 : 1;
 						})
 						.map((integration) => (
-							<ActionsSidebarTile
+							<WorkflowSidebarTile
 								integration={integration}
 								onConnect={() => paragonConnect!.connect(integration.type, {})}
 								integrationEnabled={
@@ -96,10 +97,8 @@ export default function ActionsSidebar({ session }: { session: { paragonUserToke
 					className="text-indigo-700 hover:text-indigo-500 font-semibold">
 					our docs
 				</a>
-				&nbsp;for our full list of supported ActionKit integrations
+				&nbsp;for our full list of supported Actions for Workflow Builders
 			</p>
 		</div>
 	);
 }
-
-

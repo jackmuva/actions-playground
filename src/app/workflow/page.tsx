@@ -1,7 +1,7 @@
 import { userWithToken } from "@/lib/auth";
 import { Navbar } from "@/components/custom/navbar";
-import WorkflowArea from "@/components/custom/workflow-area";
-import WorkflowSidebar from "@/components/custom/workflow-sidebar";
+import WorkflowArea from "@/components/custom/workflow/workflow-area";
+import WorkflowSidebar from "@/components/custom/workflow/workflow-sidebar";
 
 export default async function WorkflowPage() {
 	const session = await userWithToken();

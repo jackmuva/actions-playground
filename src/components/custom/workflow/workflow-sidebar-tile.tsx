@@ -1,8 +1,8 @@
 import { ChevronDownIcon, Info } from "lucide-react";
 import { useState } from "react";
-import { Button } from "../ui/button";
-import { ParagonAction } from "../feature/action-tester";
-import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import { Button } from "../../ui/button";
+import { ParagonAction } from "../../feature/action-tester";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../../ui/tooltip";
 import { WorkflowActionTile } from "./workflow-action-tile";
 
 type TileProps = {
