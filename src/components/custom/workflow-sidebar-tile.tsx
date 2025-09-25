@@ -1,8 +1,11 @@
-import { ChevronDownIcon } from "lucide-react";
+import { ChevronDownIcon, Info } from "lucide-react";
 import { useState } from "react";
 import { Button } from "../ui/button";
+import { ParagonAction } from "../feature/action-tester";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import { WorkflowActionTile } from "./workflow-action-tile";
 
-type IntegrationTileProps = {
+type TileProps = {
 	integration: {
 		icon: string;
 		name: string;
@@ -10,13 +13,15 @@ type IntegrationTileProps = {
 	};
 	integrationEnabled?: boolean;
 	onConnect: () => void;
+	actions: Array<ParagonAction>
 };
 
-export function IntegrationTile({
+export function WorkflowSidebarTile({
 	integration,
 	integrationEnabled,
 	onConnect,
-}: IntegrationTileProps) {
+	actions,
+}: TileProps) {
 	const [expanded, setExpanded] = useState(false);
 
 	const handleClick = () => {
@@ -65,8 +70,34 @@ export function IntegrationTile({
 					</div>
 				</div>
 				{expanded ? (
-					<div className="border-slate-300 dark:border-slate-700 p-4 pt-2">
-						<div className="flex flex-col space-y-2 items-start">
+					<div className="border-slate-300 dark:border-slate-700 p-4 pt-0">
+						<div className="flex space-x-1 items-center">
+							<h2 className="font-semibold text-sm mb-2">
+								Available Workflow Actions
+							</h2>
+							<Tooltip>
+								<TooltipTrigger>
+									<Info size={12} />
+								</TooltipTrigger>
+								<TooltipContent>
+									<p className="text-sm text-wrap text-center">
+										ActionKit provides integration actions with inputs
+										<br />
+										and descriptions out-of-the-box
+									</p>
+								</TooltipContent>
+							</Tooltip>
+
+						</div>
+						<div className={`flex flex-col space-y-1 text-sm font-semibold italic`}>
+							{actions?.map((action) => {
+								return <WorkflowActionTile key={action.name}
+									icon={integration.icon}
+									action={action} />
+							})
+							}
+						</div>
+						<div className="pt-2 flex flex-col space-y-2 items-start">
 							<Button variant={"outline"} onClick={() => onConnect()}
 							>
 								Configure
