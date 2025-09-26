@@ -397,7 +397,7 @@ export default function ActionTester({ session }: { session: { paragonUserToken?
 	);
 }
 
-function overrideInput(
+export function overrideInput(
 	integration: string,
 	input: SerializedConnectInput,
 ) {

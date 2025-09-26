@@ -9,9 +9,11 @@ import { v4 } from "uuid";
 export const WorkflowActionTile = ({
 	action,
 	icon,
+	integration,
 }: {
 	action: ParagonAction,
 	icon: string,
+	integration: string,
 }) => {
 	const { nodes, setNodes } = useWorkflowStore((state) => state);
 
@@ -22,7 +24,8 @@ export const WorkflowActionTile = ({
 			position: { x: 120, y: (120 * (1 + nodes.length)) },
 			data: {
 				icon: icon,
-				action: action
+				action: action,
+				integration: integration,
 			},
 		}
 		setNodes([...nodes, node]);

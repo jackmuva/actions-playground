@@ -93,6 +93,7 @@ export function WorkflowSidebarTile({
 							{actions?.map((action) => {
 								return <WorkflowActionTile key={action.name}
 									icon={integration.icon}
+									integration={integration.type}
 									action={action} />
 							})
 							}

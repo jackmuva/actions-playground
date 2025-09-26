@@ -11,21 +11,22 @@ import {
 	applyEdgeChanges,
 	type EdgeChange,
 	type Connection,
-	BuiltInNode,
 } from '@xyflow/react';
 import { ParagonAction } from '@/components/feature/action-tester';
 
 export type ActionNodeType = Node<{
 	action: ParagonAction,
 	icon: string,
+	integration: string,
 }, 'actionNode'>
 
 export type TriggerNodeType = Node<{
 	action?: ParagonAction,
 	icon?: string,
+	integration?: string,
 }, 'triggerNode'>
 
-export type WorkflowNode = BuiltInNode | ActionNodeType | TriggerNodeType;
+export type WorkflowNode = ActionNodeType | TriggerNodeType;
 
 type WorkflowState = {
 	nodes: WorkflowNode[];
@@ -33,10 +34,10 @@ type WorkflowState = {
 	onNodesChange: OnNodesChange<Node>;
 	onEdgesChange: OnEdgesChange;
 	onConnect: OnConnect;
-	selectedNodeId: string | null;
+	selectedNode: WorkflowNode | null;
 	setNodes: (nodes: WorkflowNode[]) => void;
 	setEdges: (edges: Edge[]) => void;
-	setSelectedNodeId: (id: string) => void;
+	setSelectedNode: (nodeId: string) => void;
 }
 
 
@@ -79,6 +80,8 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
 	},
 
 	setSelectedNode: (nodeId: string) => {
-		set({ selectedNodeId: nodeId });
+		const nodes = get().nodes;
+		const node = nodes.filter((node) => node.id === nodeId)[0];
+		set({ selectedNode: node });
 	},
 }));
