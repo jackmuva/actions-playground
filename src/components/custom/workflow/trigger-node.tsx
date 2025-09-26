@@ -3,12 +3,12 @@ import { Handle, NodeProps, Position } from "@xyflow/react";
 import { TriggerNodeType, useWorkflowStore } from "@/store/workflowStore";
 
 export function TriggerNode({ id, data }: NodeProps<TriggerNodeType>) {
-	const { setSelectedNodeId } = useWorkflowStore((state) => state);
+	const { setSelectedNode } = useWorkflowStore((state) => state);
 	return (
 		<div className="border w-52 h-16 flex p-1 justify-center items-center 
 			rounded-sm bg-background-muted/10 hover:bg-background-muted/30
 			cursor-pointer space-x-1 shadow-lg relative"
-			onClick={() => setSelectedNodeId(id)}>
+			onClick={() => setSelectedNode(id)}>
 			<Zap color="#4338ca" size={20} />
 			<p className="font-bold italic text-indigo-700">
 				Add Trigger

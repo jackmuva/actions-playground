@@ -9,18 +9,20 @@ export default function ActionInputSidebar() {
 	const [inputValues, setInputValues] = useState<Record<string, ConnectInputValue>>({});
 
 	return (
-		selectedNode !== null && selectedNode.data.action ? (
-			selectedNode.data.action.inputs?.map((input: SerializedConnectInput) => (
-				<SerializedConnectInputPicker
-					key={input.id}
-					integration={selectedNode.data.integration!}
-					field={overrideInput(selectedNode.data.integration!, input)}
-					value={inputValues[input.id]}
-					onChange={(v) =>
-						setInputValues((prev) => ({ ...prev, [input.id]: v }))
-					}
-				/>
-			)
-			)) : (<></>)
+		<div className="w-full flex flex-col gap-4">
+			{selectedNode !== null && selectedNode.data.action ? (
+				selectedNode.data.action.inputs?.map((input: SerializedConnectInput) => (
+					<SerializedConnectInputPicker
+						key={input.id}
+						integration={selectedNode.data.integration!}
+						field={overrideInput(selectedNode.data.integration!, input)}
+						value={inputValues[input.id]}
+						onChange={(v) =>
+							setInputValues((prev) => ({ ...prev, [input.id]: v }))
+						}
+					/>
+				)
+				)) : (<></>)}
+		</div>
 	);
 }
