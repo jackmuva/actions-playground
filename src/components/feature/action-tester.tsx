@@ -42,6 +42,22 @@ export type ParagonAction = {
 	inputs?: SerializedConnectInput[];
 };
 
+export const formatInputs = (inputValues: Record<string, ConnectInputValue>): any => {
+	let formattedInputs: Record<string, string> = {};
+	for (const input of Object.keys(inputValues)) {
+		if (typeof inputValues[input] === "object") {
+			//@ts-expect-error extending ConnectInputValue
+			formattedInputs[input] = inputValues[input].selected;
+			//@ts-expect-error extending ConnectInputValue
+			formattedInputs = { ...formattedInputs, ...inputValues[input].dependents };
+		} else {
+			//@ts-expect-error extending ConnectInputValue
+			formattedInputs[input] = inputValues[input];
+		}
+	}
+	return formattedInputs;
+}
+
 export default function ActionTester({ session }: { session: { paragonUserToken?: string } }) {
 	const { paragonConnect } = useParagon(session.paragonUserToken ?? "");
 	const [integration, setIntegration] = useState<string | null>(null);
@@ -54,21 +70,6 @@ export default function ActionTester({ session }: { session: { paragonUserToken?
 	const [actionQuery, setActionQuery] = useState('');
 	const [isDisconnecting, setIsDisconnecting] = useState(false);
 
-	const formatInputs = (): any => {
-		let formattedInputs: Record<string, string> = {};
-		for (const input of Object.keys(inputValues)) {
-			if (typeof inputValues[input] === "object") {
-				//@ts-expect-error extending ConnectInputValue
-				formattedInputs[input] = inputValues[input].selected;
-				//@ts-expect-error extending ConnectInputValue
-				formattedInputs = { ...formattedInputs, ...inputValues[input].dependents };
-			} else {
-				//@ts-expect-error extending ConnectInputValue
-				formattedInputs[input] = inputValues[input];
-			}
-		}
-		return formattedInputs;
-	}
 
 	const { data: actions, isLoading: actionsIsLoading } = useSWR(`actions/${integration}`, async () => {
 		//@ts-expect-error is type Authenticated Connected User
@@ -102,7 +103,7 @@ export default function ActionTester({ session }: { session: { paragonUserToken?
 				},
 				body: JSON.stringify({
 					action: selectedAction.name,
-					parameters: formatInputs(),
+					parameters: formatInputs(inputValues),
 				}),
 			},
 		);
@@ -340,7 +341,7 @@ export default function ActionTester({ session }: { session: { paragonUserToken?
 									&#125;,<br />
 									body: &#123;<br />
 									&nbsp;action: {selectedAction?.name},<br />
-									&nbsp;parameters: {JSON.stringify(formatInputs())},<br />
+									&nbsp;parameters: {JSON.stringify(formatInputs(inputValues))},<br />
 									&#125;
 								</pre>
 							</div>

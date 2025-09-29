@@ -11,7 +11,7 @@ export default function WorkflowSidebar({ session }: { session: { paragonUserTok
 
 	return (
 		<div className="w-[500px] max-h-full overflow-y-auto">
-			<div className="flex flex-col space-y-0 items-start w-full mb-4">
+			<div className="flex justify-between items-center mb-4">
 				<div className="flex space-x-1 items-center">
 					<h1 className="font-semibold ">
 						Integration Nodes

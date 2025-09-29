@@ -1,11 +1,24 @@
 import { Button } from "@/components/ui/button"
 import { useWorkflowStore, WorkflowNode } from "@/store/workflowStore";
-import { CircleChevronLeft, CirclePlus } from "lucide-react"
+import { CircleChevronLeft, CirclePlus, TestTubeDiagonal } from "lucide-react"
 
 export const SLACK_ICON = "https://cdn.useparagon.com/latest/dashboard/public/integrations/slack.svg";
 
 export default function TriggerInputSidebar() {
-	const { nodes, setNodes, setSelectedNode } = useWorkflowStore((state) => state);
+	const { nodes, selectedNode, setOutputSidebar, setNodes, setSelectedNode } = useWorkflowStore((state) => state);
+
+	const setSelectedNodeData = (data: string) => {
+		if (!selectedNode) return;
+		const newNodes = nodes;
+
+		for (const node of newNodes) {
+			if (node.id === selectedNode.id) {
+				node.data.output = data;
+			}
+		}
+		setNodes(newNodes);
+		setOutputSidebar(true);
+	};
 
 	const updateTrigger = (name: string) => {
 		const newNodes: Array<WorkflowNode> = nodes.filter((node) => node.id !== "trigger");;
@@ -19,20 +32,33 @@ export default function TriggerInputSidebar() {
 				trigger: {
 					name: name,
 					title: "Slack App Mentioned"
-				}
+				},
 			}
 		};
-		setNodes([...newNodes, newTriggerNode]);
+		setNodes([newTriggerNode, ...newNodes]);
+		setSelectedNode("trigger");
 	}
 
 	return (
 		<div className="w-full flex flex-col gap-4">
-			<Button variant={"outline"} size={"sm"}
-				className="w-fit"
-				onClick={() => setSelectedNode(null)}>
-				<CircleChevronLeft size={12} />
-				Back
-			</Button>
+			<div className="w-full flex justify-between items-center">
+				<Button variant={"outline"} size={"sm"}
+					className="w-fit"
+					onClick={() => setSelectedNode(null)}>
+					<CircleChevronLeft size={12} />
+					Back
+				</Button>
+				{/* TODO:Replace the onclick with switch statement 
+						when more triggers are implemented */}
+				{selectedNode && selectedNode.data.trigger &&
+					<Button variant={"outline"} size={"sm"}
+						className="w-fit "
+						onClick={() => setSelectedNodeData(APP_MENTION_TEST_PAYLOAD)}>
+						<TestTubeDiagonal size={12} />
+						Test Step
+					</Button>
+				}
+			</div>
 
 			<div className="border rounded-sm p-4 flex justify-between items-center">
 				<div className="flex items-center overflow-hidden">
@@ -43,7 +69,7 @@ export default function TriggerInputSidebar() {
 				</div>
 				<Button variant={"outline"} size={"sm"}
 					className="h-fit py-1"
-					onClick={() => { updateTrigger("SLACK_APP_MENTION_TRIGGER") }}>
+					onClick={() => updateTrigger("SLACK_APP_MENTION_TRIGGER")}>
 					<CirclePlus size={15} />Trigger
 				</Button>
 			</div>
@@ -51,7 +77,7 @@ export default function TriggerInputSidebar() {
 	);
 }
 
-export const APP_MENTION_TEST_PAYLOAD = {
+export const APP_MENTION_TEST_PAYLOAD = JSON.stringify({
 	"result": {
 		"blocks": [
 			{
@@ -79,4 +105,4 @@ export const APP_MENTION_TEST_PAYLOAD = {
 		"type": "app_mention",
 		"user": "U048S106P"
 	}
-}
+}, null, 2);

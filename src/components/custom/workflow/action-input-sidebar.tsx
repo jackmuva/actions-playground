@@ -1,4 +1,4 @@
-import { overrideInput } from "@/components/feature/action-tester";
+import { formatInputs, overrideInput } from "@/components/feature/action-tester";
 import { SerializedConnectInputPicker } from "@/components/feature/serialized-connect-input-picker";
 import { Button } from "@/components/ui/button";
 import { useWorkflowStore } from "@/store/workflowStore";
@@ -8,40 +8,57 @@ import { useState } from "react";
 import useSWR from "swr";
 
 export default function ActionInputSidebar() {
-	const { setSelectedNode, selectedNode } = useWorkflowStore((state) => state);
+	const {
+		setSelectedNode,
+		selectedNode,
+		paragonToken,
+		nodes,
+		setNodes,
+		setOutputSidebar,
+	} = useWorkflowStore((state) => state);
 	const [inputValues, setInputValues] = useState<Record<string, ConnectInputValue>>({});
 
-	// 	const { data: actionData, error: actionError, mutate: actionMutate, isLoading: actionIsLoading } = useSWR(`run/action`, async () => {
-	// 		if (!selectedAction) {
-	// 			throw new Error('No action selected');
-	// 		}
-	//
-	// 		const response = await fetch(
-	// 			`https://actionkit.useparagon.com/projects/${process.env.NEXT_PUBLIC_PARAGON_PROJECT_ID}/actions`,
-	// 			{
-	// 				method: 'POST',
-	// 				headers: {
-	// 					Authorization: `Bearer ${session.paragonUserToken}`,
-	// 					'Content-Type': 'application/json',
-	// 				},
-	// 				body: JSON.stringify({
-	// 					action: selectedAction.name,
-	// 					parameters: formatInputs(),
-	// 				}),
-	// 			},
-	// 		);
-	// 		if (!response.ok) {
-	// 			const error = await response.json();
-	// 			throw error;
-	// 		}
-	// 		const data = await response.json();
-	// 		return data;
-	// 	},
-	// 		{
-	// 			revalidateOnMount: false,
-	// 			revalidateOnFocus: false,
-	// 		})
-	//
+	const setSelectedNodeData = (data: string) => {
+		if (!selectedNode) return;
+		const newNodes = nodes;
+
+		for (const node of newNodes) {
+			if (node.id === selectedNode.id) {
+				node.data.output = data;
+			}
+		}
+		setNodes(newNodes);
+		setOutputSidebar(true);
+	};
+
+	const { mutate: actionMutate } = useSWR(`run/action/${selectedNode?.id}`, async () => {
+		const response = await fetch(
+			`https://actionkit.useparagon.com/projects/${process.env.NEXT_PUBLIC_PARAGON_PROJECT_ID}/actions`,
+			{
+				method: 'POST',
+				headers: {
+					Authorization: `Bearer ${paragonToken}`,
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					action: selectedNode?.data.action!.name,
+					parameters: formatInputs(inputValues),
+				}),
+			},
+		);
+		if (!response.ok) {
+			const error = await response.json();
+			throw error;
+		}
+		const data = await response.json();
+		setSelectedNodeData(JSON.stringify(data, null, 2));
+	},
+		{
+			revalidateOnMount: false,
+			revalidateOnFocus: false,
+		}
+	);
+
 	return (
 		<div className="w-full flex flex-col gap-4">
 			<div className="w-full flex justify-between">
@@ -52,8 +69,8 @@ export default function ActionInputSidebar() {
 					Back
 				</Button>
 				<Button variant={"outline"} size={"sm"}
-					className="w-fit bg-blue-700 text-white"
-					onClick={() => { }}>
+					className="w-fit"
+					onClick={() => actionMutate(undefined, { revalidate: true })}>
 					<TestTubeDiagonal size={12} />
 					Test Step
 				</Button>
