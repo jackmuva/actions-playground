@@ -20,7 +20,15 @@ export type ActionNodeType = Node<{
 	integration: string,
 }, 'actionNode'>
 
+export type ParagonTrigger = {
+	name: string;
+	title: string;
+	input?: Record<string, string>;
+};
+
+
 export type TriggerNodeType = Node<{
+	trigger: ParagonTrigger | null,
 	action?: ParagonAction,
 	icon?: string,
 	integration?: string,
@@ -37,7 +45,7 @@ type WorkflowState = {
 	selectedNode: WorkflowNode | null;
 	setNodes: (nodes: WorkflowNode[]) => void;
 	setEdges: (edges: Edge[]) => void;
-	setSelectedNode: (nodeId: string) => void;
+	setSelectedNode: (nodeId: string | null) => void;
 }
 
 
@@ -47,7 +55,9 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
 		id: "trigger",
 		type: 'triggerNode',
 		position: { x: 100, y: 100 },
-		data: {}
+		data: {
+			trigger: null
+		}
 	}],
 	edges: [],
 	selectedNodeId: null,

@@ -13,6 +13,7 @@ const nodeTypes = {
 
 export default function WorkflowArea() {
 	const { nodes, edges, onNodesChange, onEdgesChange, onConnect } = useWorkflowStore((state) => state);
+	console.log("edges:", edges);
 	return (
 		<div className="w-full h-full">
 			<ReactFlow nodes={nodes}

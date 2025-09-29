@@ -15,6 +15,12 @@ pnpm dev
 bun dev
 ```
 
+## Todos
+- test step
+- test workflow
+- deploy workflow
+- when on deployed state, poll for trigger and update step ui
+
 ## Playground Goals
 ### Our goal: 
 Have prospects and customers understand **what ActionKit is and what the value is**. We want to give them a frictionless experience 

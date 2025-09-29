@@ -4,6 +4,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "../../ui/tooltip";
 import { useWorkflowStore } from "@/store/workflowStore";
 import OptionsSidebar from "./options-sidebar";
 import ActionInputSidebar from "./action-input-sidebar";
+import TriggerInputSidebar from "./trigger-input-sidebar";
 
 export default function WorkflowSidebar({ session }: { session: { paragonUserToken?: string } }) {
 	const selectedNode = useWorkflowStore((state) => state.selectedNode);
@@ -27,8 +28,10 @@ export default function WorkflowSidebar({ session }: { session: { paragonUserTok
 					</Tooltip>
 				</div>
 			</div>
-			{!selectedNode ? <OptionsSidebar session={session} /> : <ActionInputSidebar />}
-			<p className="text-sm text-neutral-500 text-wrap text-center">
+			{!selectedNode ? <OptionsSidebar session={session} /> :
+				selectedNode.id === 'trigger' ? <TriggerInputSidebar /> :
+					<ActionInputSidebar />}
+			<p className="mt-4 text-sm text-neutral-500 text-wrap text-center">
 				Visit&nbsp;
 				<a href="https://docs.useparagon.com/actionkit/overview"
 					target="_blank"
