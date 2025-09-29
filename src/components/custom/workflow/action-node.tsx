@@ -1,5 +1,4 @@
 import { Position, Handle, NodeProps } from "@xyflow/react";
-import { Plug } from "lucide-react";
 import { ActionNodeType, useWorkflowStore } from "@/store/workflowStore";
 
 export function ActionNode({ id, data }: NodeProps<ActionNodeType>) {
@@ -10,12 +9,10 @@ export function ActionNode({ id, data }: NodeProps<ActionNodeType>) {
 			cursor-pointer space-x-1 shadow-lg relative"
 			onClick={() => setSelectedNode(id)}>
 			<Handle type="target" position={Position.Top} />
-			<Plug className="absolute -top-3" size={20} />
 			<div className="flex items-center overflow-hidden">
 				<img alt="integration icon" src={data.icon} className="w-4 h-4 mr-1" />
 				{data.action.title}
 			</div>
-			<Plug className="absolute -bottom-3 rotate-180" size={20} />
 			<Handle type="source" position={Position.Bottom} />
 		</div>
 	);

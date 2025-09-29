@@ -28,7 +28,6 @@ export function TriggerNode({ id, data }: NodeProps<TriggerNodeType>) {
 					</p>
 				</>
 			)}
-			<Plug className="rotate-180 absolute -bottom-3" size={20} />
 			<Handle type="source" position={Position.Bottom} />
 		</div>
 	);

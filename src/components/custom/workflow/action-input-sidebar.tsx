@@ -3,21 +3,62 @@ import { SerializedConnectInputPicker } from "@/components/feature/serialized-co
 import { Button } from "@/components/ui/button";
 import { useWorkflowStore } from "@/store/workflowStore";
 import { ConnectInputValue, SerializedConnectInput } from "@useparagon/connect";
-import { CircleChevronLeft } from "lucide-react";
+import { CircleChevronLeft, TestTubeDiagonal } from "lucide-react";
 import { useState } from "react";
+import useSWR from "swr";
 
 export default function ActionInputSidebar() {
 	const { setSelectedNode, selectedNode } = useWorkflowStore((state) => state);
 	const [inputValues, setInputValues] = useState<Record<string, ConnectInputValue>>({});
 
+	// 	const { data: actionData, error: actionError, mutate: actionMutate, isLoading: actionIsLoading } = useSWR(`run/action`, async () => {
+	// 		if (!selectedAction) {
+	// 			throw new Error('No action selected');
+	// 		}
+	//
+	// 		const response = await fetch(
+	// 			`https://actionkit.useparagon.com/projects/${process.env.NEXT_PUBLIC_PARAGON_PROJECT_ID}/actions`,
+	// 			{
+	// 				method: 'POST',
+	// 				headers: {
+	// 					Authorization: `Bearer ${session.paragonUserToken}`,
+	// 					'Content-Type': 'application/json',
+	// 				},
+	// 				body: JSON.stringify({
+	// 					action: selectedAction.name,
+	// 					parameters: formatInputs(),
+	// 				}),
+	// 			},
+	// 		);
+	// 		if (!response.ok) {
+	// 			const error = await response.json();
+	// 			throw error;
+	// 		}
+	// 		const data = await response.json();
+	// 		return data;
+	// 	},
+	// 		{
+	// 			revalidateOnMount: false,
+	// 			revalidateOnFocus: false,
+	// 		})
+	//
 	return (
 		<div className="w-full flex flex-col gap-4">
-			<Button variant={"outline"} size={"sm"}
-				className="w-fit"
-				onClick={() => setSelectedNode(null)}>
-				<CircleChevronLeft size={12} />
-				Back
-			</Button>
+			<div className="w-full flex justify-between">
+				<Button variant={"outline"} size={"sm"}
+					className="w-fit"
+					onClick={() => setSelectedNode(null)}>
+					<CircleChevronLeft size={12} />
+					Back
+				</Button>
+				<Button variant={"outline"} size={"sm"}
+					className="w-fit bg-blue-700 text-white"
+					onClick={() => { }}>
+					<TestTubeDiagonal size={12} />
+					Test Step
+				</Button>
+
+			</div>
 			{selectedNode !== null && selectedNode.data.action ? (
 				selectedNode.data.action.inputs?.length === 0 ? (
 					<div className="font-bold italic">

@@ -10,7 +10,7 @@ export default function WorkflowSidebar({ session }: { session: { paragonUserTok
 	const selectedNode = useWorkflowStore((state) => state.selectedNode);
 
 	return (
-		<div className="max-w-[500px] max-h-full overflow-y-auto">
+		<div className="w-[500px] max-h-full overflow-y-auto">
 			<div className="flex flex-col space-y-0 items-start w-full mb-4">
 				<div className="flex space-x-1 items-center">
 					<h1 className="font-semibold ">
