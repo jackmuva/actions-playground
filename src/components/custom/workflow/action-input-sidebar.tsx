@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { useWorkflowStore } from "@/store/workflowStore";
 import { ConnectInputValue, SerializedConnectInput } from "@useparagon/connect";
 import { CircleChevronLeft, TestTubeDiagonal } from "lucide-react";
-import { useState } from "react";
 import useSWR from "swr";
 
 export default function ActionInputSidebar() {
@@ -42,6 +41,7 @@ export default function ActionInputSidebar() {
 		setOutputSidebar(true);
 	};
 
+	//TODO:add loading state
 	const { mutate: actionMutate } = useSWR(`run/action/${selectedNode?.id}`, async () => {
 		const response = await fetch(
 			`https://actionkit.useparagon.com/projects/${process.env.NEXT_PUBLIC_PARAGON_PROJECT_ID}/actions`,

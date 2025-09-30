@@ -28,6 +28,21 @@ export const OutputSidebar = () => {
 		setOutputSidebar(true);
 	};
 
+	const deployWf = async () => {
+		const res = await fetch(
+			`${window.document.location.origin}/api/workflow/deploy`,
+			{
+				method: "POST",
+				body: JSON.stringify({
+					nodes: nodes,
+					edges: edges
+				}),
+			}
+		)
+		console.log(await res.json());
+	}
+
+	//TODO:Loading state when workflow is being run
 	const performAction = async (node: WorkflowNode): Promise<string> => {
 		if (node.data.trigger && node.data.trigger.name === "SLACK_APP_MENTION_TRIGGER") {
 			return SLACK_APP_MENTION_TEST_PAYLOAD;
@@ -80,7 +95,7 @@ export const OutputSidebar = () => {
 	}
 
 	return (
-		<div className="w-fit max-h-full overflow-y-auto absolute top-24 right-0 z-40 px-2
+		<div className="w-fit max-h-full overflow-y-auto absolute top-24 right-0 px-2
 			flex flex-col items-end">
 			<div className="flex gap-2 mb-2 pt-2">
 				<Button size={"sm"} variant={"outline"} className=""
@@ -90,6 +105,7 @@ export const OutputSidebar = () => {
 					Test Workflow
 				</Button>
 				<Button size={"sm"} variant={"outline"} className=""
+					onClick={() => deployWf()}
 					disabled={nodes[0].data.trigger ? false : true}>
 					<Box size={12} />
 					Deploy

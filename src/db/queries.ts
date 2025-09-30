@@ -1,34 +1,69 @@
 import 'dotenv/config';
 import { drizzle } from 'drizzle-orm/libsql';
-import { createClient } from '@libsql/client';
-import { User, user } from './schema';
+import { createClient, ResultSet } from '@libsql/client';
+import { User, user, Workflow, workflow } from './schema';
 import { eq } from 'drizzle-orm';
+import { Edge, Node } from '@xyflow/react';
 
 const db = drizzle(
-  createClient({
-    url: process.env.TURSO_DATABASE_URL!,
-    authToken: process.env.TURSO_AUTH_TOKEN ?? "",
-  })
+	createClient({
+		url: process.env.TURSO_DATABASE_URL!,
+		authToken: process.env.TURSO_AUTH_TOKEN ?? "",
+	})
 )
 
 export async function getUser(email: string): Promise<Array<User>> {
-  try {
-    return await db.select().from(user).where(eq(user.email, email));
-  } catch (error) {
-    console.error("Failed to get user from database", error);
-    throw error;
-  }
+	try {
+		return await db.select().from(user).where(eq(user.email, email));
+	} catch (error) {
+		console.error("Failed to get user from database", error);
+		throw error;
+	}
 }
 
 export async function createUser(
-  email: string,
-) {
+	id: string,
+	email: string,
+): Promise<ResultSet> {
+	try {
+		return await db.insert(user).values({ id, email });
+	} catch (error) {
+		console.error("Failed to create user in database");
+		throw error;
+	}
+}
 
-  try {
-    return await db.insert(user).values({ email });
-  } catch (error) {
-    console.error("Failed to create user in database");
-    throw error;
-  }
+export async function getWorkflowByUser(userId: string): Promise<Array<Workflow>> {
+	try {
+		console.log("user id:", userId);
+		return await db.select().from(workflow).where(eq(workflow.userId, userId));
+	} catch (error) {
+		console.error("Failed to get workflow from database", error);
+		throw error;
+	}
+}
+
+export async function upsertWorkflow(
+	nodes: Node[],
+	edges: Edge[],
+	userId: string,
+): Promise<Workflow[]> {
+	try {
+		const workflows: Workflow[] = await getWorkflowByUser(userId);
+		console.log("existing workflows: ", workflows);
+		if (workflows.length > 0) {
+			return await db.update(workflow)
+				.set({ nodes, edges, userId })
+				.where(eq(workflow.userId, userId))
+				.returning();
+		} else {
+			return await db.insert(workflow)
+				.values({ nodes, edges, userId })
+				.returning();
+		}
+	} catch (error) {
+		console.error("Failed to create workflow in database");
+		throw error;
+	}
 }
 

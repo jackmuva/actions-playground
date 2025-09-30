@@ -33,6 +33,7 @@ export default function TriggerInputSidebar() {
 					name: name,
 					title: "Slack App Mentioned"
 				},
+				inputValues: {}
 			}
 		};
 		setNodes([newTriggerNode, ...newNodes]);
