@@ -57,6 +57,8 @@ type WorkflowState = {
 	setOutputSidebar: (open: boolean) => void;
 	paragonToken: string | null;
 	setParagonToken: (token: string | null) => void;
+	deployed: boolean;
+	setDeployed: (deploy: boolean) => void;
 }
 
 
@@ -75,7 +77,9 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
 	selectedNodeId: null,
 	outputSidebar: false,
 	paragonToken: null,
+	deployed: false,
 
+	//TODO:fix typing on this
 	//@ts-expect-error not sure why yet
 	onNodesChange: (changes: NodeChange<WorkflowNode>[]) => {
 		set({
@@ -112,4 +116,6 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
 	setOutputSidebar: (isOpen: boolean) => set({ outputSidebar: isOpen }),
 
 	setParagonToken: (token: string | null) => set({ paragonToken: token }),
+
+	setDeployed: (deploy: boolean) => set({ deployed: deploy }),
 }));

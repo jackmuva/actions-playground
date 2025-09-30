@@ -4,6 +4,7 @@ import { createClient, ResultSet } from '@libsql/client';
 import { User, user, Workflow, workflow } from './schema';
 import { eq } from 'drizzle-orm';
 import { Edge, Node } from '@xyflow/react';
+import { WorkflowNode } from '@/store/workflowStore';
 
 const db = drizzle(
 	createClient({
@@ -35,7 +36,6 @@ export async function createUser(
 
 export async function getWorkflowByUser(userId: string): Promise<Array<Workflow>> {
 	try {
-		console.log("user id:", userId);
 		return await db.select().from(workflow).where(eq(workflow.userId, userId));
 	} catch (error) {
 		console.error("Failed to get workflow from database", error);
@@ -44,13 +44,12 @@ export async function getWorkflowByUser(userId: string): Promise<Array<Workflow>
 }
 
 export async function upsertWorkflow(
-	nodes: Node[],
+	nodes: WorkflowNode[],
 	edges: Edge[],
 	userId: string,
 ): Promise<Workflow[]> {
 	try {
 		const workflows: Workflow[] = await getWorkflowByUser(userId);
-		console.log("existing workflows: ", workflows);
 		if (workflows.length > 0) {
 			return await db.update(workflow)
 				.set({ nodes, edges, userId })

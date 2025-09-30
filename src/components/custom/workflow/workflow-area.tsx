@@ -16,6 +16,20 @@ export default function WorkflowArea({ session }: { session: { paragonUserToken?
 	const { nodes, edges, onNodesChange, onEdgesChange, onConnect, setParagonToken } = useWorkflowStore((state) => state);
 
 	useEffect(() => {
+		//NOTE:Consider deleting deployed workflow when user leaves
+		// if (typeof window !== 'undefined') {
+		// 	const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+		// 		event.preventDefault();
+		// 		event.returnValue = "hi";
+		// 		return "hi";
+		// 	};
+		//
+		// 	window.addEventListener("beforeunload", handleBeforeUnload);
+		//
+		// 	return () => {
+		// 		window.removeEventListener("beforeunload", handleBeforeUnload);
+		// 	};
+		// }
 		setParagonToken(session.paragonUserToken ?? null);
 	}, [session.paragonUserToken, setParagonToken]);
 

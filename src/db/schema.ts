@@ -4,7 +4,8 @@ import {
 	sqliteTable,
 	text,
 } from "drizzle-orm/sqlite-core";
-import { Edge, Node } from "@xyflow/react";
+import { Edge } from "@xyflow/react";
+import { WorkflowNode } from "@/store/workflowStore";
 
 export const user = sqliteTable("User", {
 	id: text("id").notNull().primaryKey().$defaultFn(v4),
@@ -15,7 +16,7 @@ export type User = InferSelectModel<typeof user>;
 
 export const workflow = sqliteTable("Workflow", {
 	id: text("id").notNull().primaryKey().$defaultFn(v4),
-	nodes: text("nodes", { mode: 'json' }).$type<Node[]>().notNull(),
+	nodes: text("nodes", { mode: 'json' }).$type<WorkflowNode[]>().notNull(),
 	edges: text("edges", { mode: 'json' }).$type<Edge[]>().notNull(),
 	userId: text("userId").references(() => user.id).notNull(),
 });

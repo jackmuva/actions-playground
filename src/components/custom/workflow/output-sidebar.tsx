@@ -5,6 +5,8 @@ import { Box, CircleChevronRight, ClipboardCopy, Waypoints } from "lucide-react"
 import { OutputTile } from "./output-tile";
 import { formatInputs } from "@/components/feature/action-tester";
 import { SLACK_APP_MENTION_TEST_PAYLOAD } from "./trigger-input-sidebar";
+import useSWR from "swr";
+import { Workflow } from "@/db/schema";
 
 export const OutputSidebar = () => {
 	const {
@@ -14,6 +16,8 @@ export const OutputSidebar = () => {
 		nodes,
 		edges,
 		paragonToken,
+		deployed,
+		setDeployed,
 	} = useWorkflowStore((state) => state);
 
 	const setSelectedNodeOutput = (selectedNode: WorkflowNode, data: string) => {
@@ -38,8 +42,12 @@ export const OutputSidebar = () => {
 					edges: edges
 				}),
 			}
-		)
-		console.log(await res.json());
+		);
+		if (res.ok) {
+			setDeployed(true);
+		} else {
+			throw Error(await res.json());
+		}
 	}
 
 	//TODO:Loading state when workflow is being run
@@ -94,21 +102,44 @@ export const OutputSidebar = () => {
 		}
 	}
 
+	const { data: deployedWf, isLoading: deployedWfLoading } = useSWR(deployed ? `deployed/workflow` : null, async () => {
+		console.log("refreshing data");
+		const req = await fetch(
+			`${window.document.location.origin}/api/workflow/deploy`,
+			{
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			},
+		);
+		const res: { status: number, data: Workflow } = await req.json();
+		if (!req.ok) throw Error(res.data.toString());
+		console.log("data: ", res);
+		setNodes(res.data.nodes);
+	},
+		{
+			refreshInterval: 5000,
+		}
+	);
+
+
 	return (
 		<div className="w-fit max-h-full overflow-y-auto absolute top-24 right-0 px-2
 			flex flex-col items-end">
 			<div className="flex gap-2 mb-2 pt-2">
-				<Button size={"sm"} variant={"outline"} className=""
+				<Button size={"sm"} variant={"outline"}
 					onClick={() => testWorkflow()}
 					disabled={nodes[0].data.trigger ? false : true}>
 					<Waypoints size={12} />
 					Test Workflow
 				</Button>
-				<Button size={"sm"} variant={"outline"} className=""
+				<Button size={"sm"} variant={"outline"}
+					className={deployed ? "bg-green-400/30 dark:bg-green-400/30" : ""}
 					onClick={() => deployWf()}
 					disabled={nodes[0].data.trigger ? false : true}>
 					<Box size={12} />
-					Deploy
+					{deployed ? "Re-Deploy" : "Deploy"}
 				</Button>
 				<Button variant={"outline"} size={"sm"}
 					onClick={() => setOutputSidebar(!outputSidebar)} >
