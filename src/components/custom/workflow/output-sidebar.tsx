@@ -119,7 +119,9 @@ export const OutputSidebar = () => {
 		setNodes(res.data.nodes);
 	},
 		{
-			refreshInterval: 5000,
+			revalidateOnFocus: true,
+			revalidateOnMount: false,
+			refreshInterval: 10000,
 		}
 	);
 
