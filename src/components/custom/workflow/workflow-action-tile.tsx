@@ -27,6 +27,7 @@ export const WorkflowActionTile = ({
 				icon: icon,
 				action: action,
 				integration: integration,
+				inputValues: {},
 			},
 		}
 		setNodes([...nodes, node]);

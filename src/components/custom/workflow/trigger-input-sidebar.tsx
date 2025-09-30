@@ -53,7 +53,7 @@ export default function TriggerInputSidebar() {
 				{selectedNode && selectedNode.data.trigger &&
 					<Button variant={"outline"} size={"sm"}
 						className="w-fit "
-						onClick={() => setSelectedNodeData(APP_MENTION_TEST_PAYLOAD)}>
+						onClick={() => setSelectedNodeData(SLACK_APP_MENTION_TEST_PAYLOAD)}>
 						<TestTubeDiagonal size={12} />
 						Test Step
 					</Button>
@@ -77,7 +77,7 @@ export default function TriggerInputSidebar() {
 	);
 }
 
-export const APP_MENTION_TEST_PAYLOAD = JSON.stringify({
+export const SLACK_APP_MENTION_TEST_PAYLOAD = JSON.stringify({
 	"result": {
 		"blocks": [
 			{

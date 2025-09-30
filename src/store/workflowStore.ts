@@ -13,23 +13,28 @@ import {
 	type Connection,
 } from '@xyflow/react';
 import { ParagonAction } from '@/components/feature/action-tester';
+import { ConnectInputValue, SerializedConnectInput } from '@useparagon/connect';
 
 export type ParagonTrigger = {
 	name: string;
 	title: string;
-	input?: Record<string, string>;
+	description?: string;
+	inputs?: SerializedConnectInput[];
 };
 
 export type ActionNodeType = Node<{
 	action: ParagonAction,
 	icon: string,
 	integration: string,
+	inputValues: Record<string, ConnectInputValue>;
 	output?: string;
 	trigger?: ParagonTrigger;
 }, 'actionNode'>
 
+//TODO:Make Trigger Node type an Action Node type
 export type TriggerNodeType = Node<{
 	trigger: ParagonTrigger | null,
+	inputValues: Record<string, ConnectInputValue>;
 	action?: ParagonAction,
 	icon?: string,
 	integration?: string,
@@ -62,7 +67,8 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
 		type: 'triggerNode',
 		position: { x: 100, y: 100 },
 		data: {
-			trigger: null
+			trigger: null,
+			inputValues: {},
 		}
 	}],
 	edges: [],

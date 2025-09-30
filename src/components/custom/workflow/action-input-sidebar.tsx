@@ -16,9 +16,20 @@ export default function ActionInputSidebar() {
 		setNodes,
 		setOutputSidebar,
 	} = useWorkflowStore((state) => state);
-	const [inputValues, setInputValues] = useState<Record<string, ConnectInputValue>>({});
 
-	const setSelectedNodeData = (data: string) => {
+	const setSelectedNodeInputValues = (inputValues: Record<string, ConnectInputValue>) => {
+		if (!selectedNode) return;
+		const newNodes = nodes;
+
+		for (const node of newNodes) {
+			if (node.id === selectedNode.id) {
+				node.data.inputValues = inputValues;
+			}
+		}
+		setNodes(newNodes);
+	};
+
+	const setSelectedNodeOutput = (data: string) => {
 		if (!selectedNode) return;
 		const newNodes = nodes;
 
@@ -42,16 +53,12 @@ export default function ActionInputSidebar() {
 				},
 				body: JSON.stringify({
 					action: selectedNode?.data.action!.name,
-					parameters: formatInputs(inputValues),
+					parameters: formatInputs(selectedNode?.data.inputValues!),
 				}),
 			},
 		);
-		if (!response.ok) {
-			const error = await response.json();
-			throw error;
-		}
 		const data = await response.json();
-		setSelectedNodeData(JSON.stringify(data, null, 2));
+		setSelectedNodeOutput(JSON.stringify(data, null, 2));
 	},
 		{
 			revalidateOnMount: false,
@@ -87,10 +94,10 @@ export default function ActionInputSidebar() {
 							key={input.id}
 							integration={selectedNode.data.integration!}
 							field={overrideInput(selectedNode.data.integration!, input)}
-							value={inputValues[input.id]}
-							onChange={(v) =>
-								setInputValues((prev) => ({ ...prev, [input.id]: v }))
-							}
+							value={selectedNode.data.inputValues[input.id]}
+							onChange={(v) => {
+								setSelectedNodeInputValues({ ...selectedNode.data.inputValues, [input.id]: v })
+							}}
 						/>
 					)))
 			) : (
