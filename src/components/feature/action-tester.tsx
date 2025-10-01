@@ -42,7 +42,7 @@ export type ParagonAction = {
 	inputs?: SerializedConnectInput[];
 };
 
-export const formatInputs = (inputValues: Record<string, ConnectInputValue>): any => {
+export const formatInputs = (inputValues: Record<string, ConnectInputValue>): Record<string, string> => {
 	let formattedInputs: Record<string, string> = {};
 	for (const input of Object.keys(inputValues)) {
 		if (typeof inputValues[input] === "object") {

@@ -7,7 +7,6 @@ import { Workflow } from "@/db/schema";
 export async function POST(req: Request) {
 	const body: { data: any, userId: string } = await req.json();
 	try {
-		console.log(body);
 		const curWorkflow: Workflow = (await getWorkflowByUser(body.userId))[0];
 		const newNodes: WorkflowNode[] = await runWorkflow(
 			curWorkflow.nodes,

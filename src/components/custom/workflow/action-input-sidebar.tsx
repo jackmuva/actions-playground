@@ -43,6 +43,7 @@ export default function ActionInputSidebar() {
 
 	//TODO:add loading state
 	const { mutate: actionMutate } = useSWR(`run/action/${selectedNode?.id}`, async () => {
+		if (!selectedNode) return;
 		const response = await fetch(
 			`https://actionkit.useparagon.com/projects/${process.env.NEXT_PUBLIC_PARAGON_PROJECT_ID}/actions`,
 			{
@@ -53,7 +54,7 @@ export default function ActionInputSidebar() {
 				},
 				body: JSON.stringify({
 					action: selectedNode?.data.action!.name,
-					parameters: formatInputs(selectedNode?.data.inputValues!),
+					parameters: formatInputs(selectedNode.data.inputValues),
 				}),
 			},
 		);

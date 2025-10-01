@@ -65,7 +65,7 @@ export const OutputSidebar = () => {
 				},
 				body: JSON.stringify({
 					action: node.data.action!.name,
-					parameters: formatInputs(node?.data.inputValues!),
+					parameters: formatInputs(node.data.inputValues),
 				}),
 			},
 		);
@@ -92,7 +92,7 @@ export const OutputSidebar = () => {
 		while (queue.length > 0) {
 			const nodeId: string = queue.shift() ?? "";
 			const selectedNode: WorkflowNode = nodeMap.get(nodeId)!;
-			let res: string = await performAction(selectedNode)
+			const res: string = await performAction(selectedNode)
 			setSelectedNodeOutput(selectedNode, res);
 			if (edgeMap.has(nodeId)) {
 				for (const id of edgeMap.get(nodeId)!) {
@@ -121,7 +121,7 @@ export const OutputSidebar = () => {
 		{
 			revalidateOnFocus: true,
 			revalidateOnMount: false,
-			refreshInterval: 10000,
+			// refreshInterval: 10000,
 		}
 	);
 

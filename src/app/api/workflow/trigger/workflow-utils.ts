@@ -1,16 +1,31 @@
-import { formatInputs } from "@/components/feature/action-tester";
 import { createParagonToken } from "@/lib/auth";
 import { WorkflowNode } from "@/store/workflowStore";
+import { ConnectInputValue } from "@useparagon/connect";
 import { Edge } from "@xyflow/react";
 
-const setSelectedNodeOutput = (nodes: WorkflowNode[], selectedNode: WorkflowNode, data: string): WorkflowNode[] => {
-	const newNodes = nodes;
-
-	for (const node of newNodes) {
-		if (node.id === selectedNode.id) {
-			node.data.output = data;
+const formatInputs = (inputValues: Record<string, ConnectInputValue>): Record<string, string> => {
+	let formattedInputs: Record<string, string> = {};
+	for (const input of Object.keys(inputValues)) {
+		if (typeof inputValues[input] === "object") {
+			//@ts-expect-error extending ConnectInputValue
+			formattedInputs[input] = inputValues[input].selected;
+			//@ts-expect-error extending ConnectInputValue
+			formattedInputs = { ...formattedInputs, ...inputValues[input].dependents };
+		} else {
+			//@ts-expect-error extending ConnectInputValue
+			formattedInputs[input] = inputValues[input];
 		}
 	}
+	return formattedInputs;
+}
+
+
+const setSelectedNodeOutput = (nodes: WorkflowNode[], selectedNode: WorkflowNode, data: string): WorkflowNode[] => {
+	const newNodes: WorkflowNode[] = nodes.map(node => {
+		return node.id === selectedNode.id ?
+			{ ...node, data: { ...node.data, output: data } } as WorkflowNode
+			: node
+	});
 	return newNodes;
 };
 
@@ -29,7 +44,7 @@ const performAction = async (node: WorkflowNode, userId: string): Promise<string
 			},
 			body: JSON.stringify({
 				action: node.data.action!.name,
-				parameters: formatInputs(node?.data.inputValues!),
+				parameters: formatInputs(node.data.inputValues),
 			}),
 		},
 	);
@@ -38,7 +53,12 @@ const performAction = async (node: WorkflowNode, userId: string): Promise<string
 }
 
 export const runWorkflow = async (nodes: WorkflowNode[], edges: Edge[], userId: string, triggerInput: string): Promise<WorkflowNode[]> => {
-	let newNodes: WorkflowNode[] = nodes;
+	// console.log('nodes: ', nodes);
+	// console.log('edges: ', edges);
+	// console.log('userId: ', userId);
+	// console.log('triggerinput: ', triggerInput);
+
+	let newNodes: WorkflowNode[] = [...nodes];
 	const edgeMap: Map<string, Array<string>> = new Map();
 	const nodeMap: Map<string, WorkflowNode> = new Map();
 	const queue: Array<string> = [];
@@ -50,16 +70,16 @@ export const runWorkflow = async (nodes: WorkflowNode[], edges: Edge[], userId: 
 			edgeMap.set(edge.source, [edge.target]);
 		}
 	}
-	for (const node of nodes) {
-		nodeMap.set(node.id, node);
+	for (const node of newNodes) {
+		nodeMap.set(node.id, { ...node });
 	}
 	queue.push('trigger');
 	while (queue.length > 0) {
 		const nodeId: string = queue.shift() ?? "";
 		const selectedNode: WorkflowNode = nodeMap.get(nodeId)!;
 		//TODO:not sure if this is best with different types of triggers
-		let res: string = await performAction(selectedNode, userId) ?? triggerInput;
-		newNodes = setSelectedNodeOutput(nodes, selectedNode, res);
+		const res: string = await performAction(selectedNode, userId) ?? triggerInput;
+		newNodes = setSelectedNodeOutput(newNodes, selectedNode, res);
 		if (edgeMap.has(nodeId)) {
 			for (const id of edgeMap.get(nodeId)!) {
 				queue.push(id);
