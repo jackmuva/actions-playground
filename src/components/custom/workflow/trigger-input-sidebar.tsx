@@ -1,10 +1,31 @@
 import { Button } from "@/components/ui/button"
+import useParagon from "@/lib/hooks";
 import { useWorkflowStore, WorkflowNode } from "@/store/workflowStore";
+import { ConnectUser } from "@useparagon/connect";
 import { CircleChevronLeft, CirclePlus, TestTubeDiagonal } from "lucide-react"
+import useSWR from "swr";
 
 export const SLACK_ICON = "https://cdn.useparagon.com/latest/dashboard/public/integrations/slack.svg";
 
 export default function TriggerInputSidebar() {
+	const { paragonToken } = useWorkflowStore((state) => state);
+	const { paragonConnect } = useParagon(paragonToken ?? "");
+
+	const { data: user, isLoading: userIsLoading } = useSWR(`user`, async () => {
+		const response = await fetch(
+			`https://api.useparagon.com/projects/${process.env.NEXT_PUBLIC_PARAGON_PROJECT_ID}/sdk/me`,
+			{
+				headers: {
+					Authorization: `Bearer ${paragonToken}`,
+				},
+			},
+		);
+		const data = await response.json();
+		return data;
+	});
+
+
+	console.log('integrations: ', user);
 	const { nodes, selectedNode, setOutputSidebar, setNodes, setSelectedNode } = useWorkflowStore((state) => state);
 
 	const setSelectedNodeData = (data: string) => {
@@ -70,11 +91,17 @@ export default function TriggerInputSidebar() {
 				</div>
 				<Button variant={"outline"} size={"sm"}
 					className="h-fit py-1"
-					onClick={() => updateTrigger("SLACK_APP_MENTION_TRIGGER")}>
+					onClick={() => {
+						if (user.integrations.slack.enabled) {
+							updateTrigger("SLACK_APP_MENTION_TRIGGER")
+						} else {
+							paragonConnect!.connect("slack", {})
+						}
+					}}>
 					<CirclePlus size={15} />Trigger
 				</Button>
 			</div>
-		</div>
+		</div >
 	);
 }
 
