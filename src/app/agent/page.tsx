@@ -1,7 +1,7 @@
 import { userWithToken } from "@/lib/auth";
 import { Navbar } from "@/components/custom/navbar";
-import Chat from "@/components/custom/chat";
-import ActionsSidebar from "@/components/custom/actions-sidebar";
+import Chat from "@/components/custom/chat/chat";
+import ActionsSidebar from "@/components/custom/action/actions-sidebar";
 
 export default async function Agent() {
 	const session = await userWithToken();

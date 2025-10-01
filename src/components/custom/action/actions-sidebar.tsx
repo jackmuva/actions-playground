@@ -1,14 +1,40 @@
 "use client";
-
-import { IntegrationTile } from "./integration-tile";
 import useParagon from "@/lib/hooks";
 import { Info } from "lucide-react";
-import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../../ui/tooltip";
+import useSWR from "swr";
+import { ActionsSidebarTile } from "./actions-sidebar-tile";
+import { SidebarLoading } from "../sidebar-loading";
 
+export default function ActionsSidebar({ session }: { session: { paragonUserToken?: string } }) {
+	const { paragonConnect } = useParagon(session.paragonUserToken ?? "");
+	const integrations = paragonConnect?.getIntegrationMetadata();
 
-export default function IntegrationsSidebar({ session }: { session: { paragonUserToken?: string } }) {
-	const { user, paragonConnect, } = useParagon(session.paragonUserToken ?? "");
-	const integrations = paragonConnect?.getIntegrationMetadata() ?? [];
+	const { data: user, isLoading: userIsLoading } = useSWR(`user`, async () => {
+		const response = await fetch(
+			`https://api.useparagon.com/projects/${process.env.NEXT_PUBLIC_PARAGON_PROJECT_ID}/sdk/me`,
+			{
+				headers: {
+					Authorization: `Bearer ${session.paragonUserToken}`,
+				},
+			},
+		);
+		const data = await response.json();
+		return data;
+	});
+
+	const { data: actions, isLoading: actionsIsLoading } = useSWR(`agent/actions`, async () => {
+		const response = await fetch(
+			`https://actionkit.useparagon.com/projects/${process.env.NEXT_PUBLIC_PARAGON_PROJECT_ID}/actions?format=paragon`,
+			{
+				headers: {
+					Authorization: `Bearer ${session.paragonUserToken}`,
+				},
+			},
+		);
+		const data = await response.json();
+		return data.actions;
+	});
 
 	return (
 		<div className="w-96 max-h-full overflow-y-auto">
@@ -30,7 +56,7 @@ export default function IntegrationsSidebar({ session }: { session: { paragonUse
 				</div>
 			</div>
 			<div className="flex flex-wrap">
-				{user?.authenticated ? (
+				{user?.authenticated && !userIsLoading && !actionsIsLoading && integrations ? (
 					integrations
 						.sort((a, b) => {
 							if (
@@ -48,18 +74,19 @@ export default function IntegrationsSidebar({ session }: { session: { paragonUse
 							return a.type < b.type ? -1 : 1;
 						})
 						.map((integration) => (
-							<IntegrationTile
+							<ActionsSidebarTile
 								integration={integration}
 								onConnect={() => paragonConnect!.connect(integration.type, {})}
 								integrationEnabled={
 									user?.authenticated &&
 									user?.integrations?.[integration.type]?.enabled
 								}
+								actions={actions[integration.type]}
 								key={integration.type}
 							/>
 						))
 				) : (
-					<LoadingSkeleton />
+					<SidebarLoading />
 				)}
 			</div>
 			<p className="text-sm text-neutral-500 text-wrap text-center">
@@ -75,20 +102,4 @@ export default function IntegrationsSidebar({ session }: { session: { paragonUse
 	);
 }
 
-export const LoadingSkeleton = () => {
-	return Array(5)
-		.fill(null)
-		.map((_, i) => (
-			<div
-				className={`w-full mb-2 mr-2 rounded-lg cursor-pointer animate-pulse`}
-				key={i}
-			>
-				<div className="border border-slate-300 dark:border-slate-700 rounded p-4">
-					<div className="flex items-center mb-1">
-						<div className="inline w-4 h-4 rounded-full bg-slate-200 dark:bg-slate-500 mr-2" />
-						<div className="inline rounded-full w-48 h-2 bg-slate-200 dark:bg-slate-500" />
-					</div>
-				</div>
-			</div>
-		));
-};
+

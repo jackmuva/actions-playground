@@ -172,3 +172,10 @@
 .markdown a {
   @apply text-indigo-700 underline hover:text-indigo-600 font-semibold;
 }
+
+/* .react-flow__handle { */
+/*   width: 20px !important; */
+/*   height: 20px !important; */
+/*   background-color: transparent !important; */
+/* 	border-color: transparent !important; */
+/* } */

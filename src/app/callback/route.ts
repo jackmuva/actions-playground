@@ -6,8 +6,10 @@ export const GET = handleAuth({
 		const user = await getUser(data.user.email);
 		if (!user || user.length === 0) {
 			await createUser(
+				data.user.id,
 				data.user.email,
 			);
+
 			const req = await fetch(process.env.WEBHOOK_URL!, {
 				method: "POST",
 				body: JSON.stringify({

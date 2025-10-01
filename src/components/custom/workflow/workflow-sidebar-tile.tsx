@@ -1,8 +1,9 @@
 import { ChevronDownIcon, Info } from "lucide-react";
 import { useState } from "react";
-import { Button } from "../ui/button";
-import { ParagonAction } from "../feature/action-tester";
-import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import { Button } from "../../ui/button";
+import { ParagonAction } from "../../feature/action-tester";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../../ui/tooltip";
+import { WorkflowActionTile } from "./workflow-action-tile";
 
 type TileProps = {
 	integration: {
@@ -15,7 +16,7 @@ type TileProps = {
 	actions: Array<ParagonAction>
 };
 
-export function ActionsSidebarTile({
+export function WorkflowSidebarTile({
 	integration,
 	integrationEnabled,
 	onConnect,
@@ -71,8 +72,8 @@ export function ActionsSidebarTile({
 				{expanded ? (
 					<div className="border-slate-300 dark:border-slate-700 p-4 pt-0">
 						<div className="flex space-x-1 items-center">
-							<h2 className="font-semibold text-sm">
-								Available Tools
+							<h2 className="font-semibold text-sm mb-2">
+								Available Workflow Actions
 							</h2>
 							<Tooltip>
 								<TooltipTrigger>
@@ -80,42 +81,23 @@ export function ActionsSidebarTile({
 								</TooltipTrigger>
 								<TooltipContent>
 									<p className="text-sm text-wrap text-center">
-										ActionKit provides AI agent readable tool descriptions
+										ActionKit provides integration actions with inputs
 										<br />
-										and input descriptions out-of-the-box
+										and descriptions out-of-the-box
 									</p>
 								</TooltipContent>
 							</Tooltip>
 
 						</div>
-						<pre className={`p-2 rounded-sm text-sm bg-background-muted/20 
-						overflow-auto`}>
+						<div className={`flex flex-col space-y-1 text-sm font-semibold italic`}>
 							{actions?.map((action) => {
-								return (
-									<div key={action.name} className="text-sm">
-										<Tooltip>
-											<TooltipTrigger className="cursor-pointer 
-												hover:text-indigo-600 hover:font-semibold">
-												{action.title}
-											</TooltipTrigger>
-											<TooltipContent>
-												Inputs: &#123;
-												{action.inputs?.map((input) => {
-													return (
-														<div key={input.id}>
-															&emsp;{input.id}: {input.subtitle ?? input.title}
-														</div>
-													)
-												})
-												}
-												&#125;
-											</TooltipContent>
-										</Tooltip>
-									</div>
-								)
+								return <WorkflowActionTile key={action.name}
+									icon={integration.icon}
+									integration={integration.type}
+									action={action} />
 							})
 							}
-						</pre>
+						</div>
 						<div className="pt-2 flex flex-col space-y-2 items-start">
 							<Button variant={"outline"} onClick={() => onConnect()}
 							>

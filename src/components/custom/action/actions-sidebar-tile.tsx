@@ -1,8 +1,10 @@
-import { ChevronDownIcon } from "lucide-react";
+import { ChevronDownIcon, Info } from "lucide-react";
 import { useState } from "react";
-import { Button } from "../ui/button";
+import { Button } from "../../ui/button";
+import { ParagonAction } from "../../feature/action-tester";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../../ui/tooltip";
 
-type IntegrationTileProps = {
+type TileProps = {
 	integration: {
 		icon: string;
 		name: string;
@@ -10,13 +12,15 @@ type IntegrationTileProps = {
 	};
 	integrationEnabled?: boolean;
 	onConnect: () => void;
+	actions: Array<ParagonAction>
 };
 
-export function IntegrationTile({
+export function ActionsSidebarTile({
 	integration,
 	integrationEnabled,
 	onConnect,
-}: IntegrationTileProps) {
+	actions,
+}: TileProps) {
 	const [expanded, setExpanded] = useState(false);
 
 	const handleClick = () => {
@@ -65,8 +69,54 @@ export function IntegrationTile({
 					</div>
 				</div>
 				{expanded ? (
-					<div className="border-slate-300 dark:border-slate-700 p-4 pt-2">
-						<div className="flex flex-col space-y-2 items-start">
+					<div className="border-slate-300 dark:border-slate-700 p-4 pt-0">
+						<div className="flex space-x-1 items-center">
+							<h2 className="font-semibold text-sm">
+								Available Tools
+							</h2>
+							<Tooltip>
+								<TooltipTrigger>
+									<Info size={12} />
+								</TooltipTrigger>
+								<TooltipContent>
+									<p className="text-sm text-wrap text-center">
+										ActionKit provides AI agent readable tool descriptions
+										<br />
+										and input descriptions out-of-the-box
+									</p>
+								</TooltipContent>
+							</Tooltip>
+
+						</div>
+						<pre className={`p-2 rounded-sm text-sm bg-background-muted/20 
+						overflow-auto`}>
+							{actions?.map((action) => {
+								return (
+									<div key={action.name} className="text-sm">
+										<Tooltip>
+											<TooltipTrigger className="cursor-pointer 
+												hover:text-indigo-600 hover:font-semibold">
+												{action.title}
+											</TooltipTrigger>
+											<TooltipContent>
+												Inputs: &#123;
+												{action.inputs?.map((input) => {
+													return (
+														<div key={input.id}>
+															&emsp;{input.id}: {input.subtitle ?? input.title}
+														</div>
+													)
+												})
+												}
+												&#125;
+											</TooltipContent>
+										</Tooltip>
+									</div>
+								)
+							})
+							}
+						</pre>
+						<div className="pt-2 flex flex-col space-y-2 items-start">
 							<Button variant={"outline"} onClick={() => onConnect()}
 							>
 								Configure

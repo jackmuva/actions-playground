@@ -8,6 +8,41 @@
       "when": 1754936313336,
       "tag": "0000_lying_frightful_four",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1759258690284,
+      "tag": "0001_powerful_gambit",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1759259679191,
+      "tag": "0002_bizarre_deadpool",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1759259800353,
+      "tag": "0003_nasty_miss_america",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1759260370361,
+      "tag": "0004_new_scream",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1759350431843,
+      "tag": "0005_worthless_black_knight",
+      "breakpoints": true
     }
   ]
 }

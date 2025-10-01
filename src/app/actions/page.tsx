@@ -1,7 +1,7 @@
 import { userWithToken } from "@/lib/auth";
 import { Navbar } from "@/components/custom/navbar";
 import ActionTester from "@/components/feature/action-tester";
-import ActionsSidebar from "@/components/custom/actions-sidebar";
+import ActionsSidebar from "@/components/custom/action/actions-sidebar";
 
 export default async function Actions() {
 	const session = await userWithToken();

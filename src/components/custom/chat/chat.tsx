@@ -38,7 +38,6 @@ export default function Chat({ session }: { session: { paragonUserToken?: string
 		}
 	}, [messages]);
 
-	console.log(messages);
 	return (
 		<div className='w-full flex justify-center min-h-full max-h-full'>
 			<div className="relative flex flex-col w-full max-w-[800px] h-full 
