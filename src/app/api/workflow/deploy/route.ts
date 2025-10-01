@@ -1,5 +1,5 @@
-import { getWorkflowByUser, upsertWorkflow } from "@/db/queries";
-import { Workflow } from "@/db/schema";
+import { getRunsByUser, upsertWorkflow } from "@/db/queries";
+import { WorkflowRun } from "@/db/schema";
 import { userWithToken } from "@/lib/auth";
 import { NextResponse } from "next/server";
 
@@ -33,9 +33,9 @@ export async function GET(req: Request) {
 	}
 
 	try {
-		const deployedWf: Workflow = (await getWorkflowByUser(user.id))[0];
+		const runs: WorkflowRun[] = await getRunsByUser(user.id);
 		return NextResponse.json({
-			status: 200, data: deployedWf
+			status: 200, data: runs
 		});
 	} catch (err) {
 		return NextResponse.json({

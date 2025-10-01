@@ -7,6 +7,9 @@ import { formatInputs } from "@/components/feature/action-tester";
 import { SLACK_APP_MENTION_TEST_PAYLOAD } from "./trigger-input-sidebar";
 import useSWR from "swr";
 import { Workflow } from "@/db/schema";
+import { DeployedMenu } from "./deployed-menu";
+import { TestSidebar } from "./test-sidebar";
+import { RunSidebar } from "./run-sidebar";
 
 export const OutputSidebar = () => {
 	const {
@@ -18,6 +21,7 @@ export const OutputSidebar = () => {
 		paragonToken,
 		deployed,
 		setDeployed,
+		runSidebar,
 	} = useWorkflowStore((state) => state);
 
 	const setSelectedNodeOutput = (selectedNode: WorkflowNode, data: string) => {
@@ -102,32 +106,8 @@ export const OutputSidebar = () => {
 		}
 	}
 
-	const { data: deployedWf, isLoading: deployedWfLoading } = useSWR(deployed ? `deployed/workflow` : null, async () => {
-		console.log("refreshing data");
-		const req = await fetch(
-			`${window.document.location.origin}/api/workflow/deploy`,
-			{
-				method: 'GET',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-			},
-		);
-		const res: { status: number, data: Workflow } = await req.json();
-		if (!req.ok) throw Error(res.data.toString());
-		console.log("data: ", res);
-		setNodes(res.data.nodes);
-	},
-		{
-			revalidateOnFocus: true,
-			revalidateOnMount: false,
-			// refreshInterval: 10000,
-		}
-	);
-
-
 	return (
-		<div className="w-fit max-h-full overflow-y-auto absolute top-24 right-0 px-2
+		<div className="w-fit h-full overflow-y-auto absolute top-24 right-0 px-2
 			flex flex-col items-end">
 			<div className="flex gap-2 mb-2 pt-2">
 				<Button size={"sm"} variant={"outline"}
@@ -136,32 +116,22 @@ export const OutputSidebar = () => {
 					<Waypoints size={12} />
 					Test Workflow
 				</Button>
-				<Button size={"sm"} variant={"outline"}
-					className={deployed ? "bg-green-400/30 dark:bg-green-400/30" : ""}
+				{deployed ? (
+					<DeployedMenu />
+				) : (<Button size={"sm"} variant={"outline"}
 					onClick={() => deployWf()}
 					disabled={nodes[0].data.trigger ? false : true}>
 					<Box size={12} />
-					{deployed ? "Re-Deploy" : "Deploy"}
-				</Button>
+					Deploy
+				</Button>)}
 				<Button variant={"outline"} size={"sm"}
 					onClick={() => setOutputSidebar(!outputSidebar)} >
 					{outputSidebar ? <CircleChevronRight size={20} /> : <ClipboardCopy size={20} />}
 					{outputSidebar ? "Collapse" : "Output"}
 				</Button>
 			</div>
-			{outputSidebar && <div className="w-96 max-h-full overflow-y-auto flex flex-col relative">
-				<div className="w-full flex justify-between items-center">
-					<h1 className="font-semibold ">
-						Workflow Outputs
-					</h1>
-				</div>
-				{nodes.map((node) => {
-					if (!node.data.icon) return;
-					return (
-						<OutputTile node={node} key={node.id} />
-					);
-				})}
-			</div>}
+			{outputSidebar && <TestSidebar nodes={nodes} title="Test Output" />}
+			{runSidebar && <RunSidebar />}
 		</div>
 	);
 }

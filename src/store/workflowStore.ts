@@ -14,6 +14,7 @@ import {
 } from '@xyflow/react';
 import { ParagonAction } from '@/components/feature/action-tester';
 import { ConnectInputValue, SerializedConnectInput } from '@useparagon/connect';
+import { WorkflowRun } from '@/db/schema';
 
 export type ParagonTrigger = {
 	name: string;
@@ -59,6 +60,12 @@ type WorkflowState = {
 	setParagonToken: (token: string | null) => void;
 	deployed: boolean;
 	setDeployed: (deploy: boolean) => void;
+	runSidebar: boolean;
+	setRunSidebar: (open: boolean) => void;
+	runHistory: {
+		[id: string]: WorkflowRun,
+	};
+	setRunHistory: (runs: WorkflowRun[]) => void;
 }
 
 
@@ -78,6 +85,8 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
 	outputSidebar: false,
 	paragonToken: null,
 	deployed: false,
+	runSidebar: false,
+	runHistory: {},
 
 	//TODO:fix typing on this
 	//@ts-expect-error not sure why yet
@@ -113,9 +122,29 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
 		set({ selectedNode: node });
 	},
 
-	setOutputSidebar: (isOpen: boolean) => set({ outputSidebar: isOpen }),
+	setOutputSidebar: (isOpen: boolean) => {
+		if (isOpen) {
+			set({ runSidebar: false });
+		}
+		set({ outputSidebar: isOpen })
+	},
 
 	setParagonToken: (token: string | null) => set({ paragonToken: token }),
 
 	setDeployed: (deploy: boolean) => set({ deployed: deploy }),
+
+	setRunSidebar: (open: boolean) => {
+		if (open) {
+			set({ outputSidebar: false });
+		}
+		set({ runSidebar: open });
+	},
+
+	setRunHistory: (runs: WorkflowRun[]) => {
+		const runMap: { [id: string]: WorkflowRun } = {};
+		for (const run of runs) {
+			runMap[run.id] = { ...run };
+		}
+		set({ runHistory: runMap });
+	},
 }));

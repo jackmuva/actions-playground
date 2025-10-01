@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { runWorkflow } from "./workflow-utils";
-import { getWorkflowByUser, upsertWorkflow } from "@/db/queries";
+import { createRun, getWorkflowByUser } from "@/db/queries";
 import { WorkflowNode } from "@/store/workflowStore";
 import { Workflow } from "@/db/schema";
 
@@ -13,7 +13,7 @@ export async function POST(req: Request) {
 			curWorkflow.edges,
 			body.userId,
 			JSON.stringify(body.data, null, 2));
-		const updWf = await upsertWorkflow(newNodes, curWorkflow.edges, body.userId);
+		const updWf = await createRun(newNodes, body.userId);
 		return NextResponse.json({
 			status: 200, data: updWf
 		});

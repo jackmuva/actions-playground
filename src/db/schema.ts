@@ -22,3 +22,12 @@ export const workflow = sqliteTable("Workflow", {
 });
 
 export type Workflow = InferSelectModel<typeof workflow>;
+
+export const workflowRun = sqliteTable("WorkflowRun", {
+	id: text("id").notNull().primaryKey().$defaultFn(v4),
+	nodes: text("nodes", { mode: 'json' }).$type<WorkflowNode[]>().notNull(),
+	userId: text("userId").references(() => user.id).notNull(),
+	datetime: text("datetime").notNull(),
+});
+
+export type WorkflowRun = InferSelectModel<typeof workflowRun>;
