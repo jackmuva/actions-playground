@@ -1,16 +1,33 @@
 import { WorkflowRun } from "@/db/schema";
 import { useWorkflowStore } from "@/store/workflowStore";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useSWR from "swr";
 import { TestSidebar } from "./test-sidebar";
 import { Button } from "@/components/ui/button";
-import { CircleChevronLeft, RotateCw } from "lucide-react";
+import { CircleChevronLeft, RotateCw, TestTubeDiagonal } from "lucide-react";
 
 export const RunSidebar = () => {
-	const [selectedRun, setSelectedRun] = useState<WorkflowRun | null>(null);
-	const { deployed, runHistory, setRunHistory } = useWorkflowStore((state) => state);
+	const { runHistory, setRunHistory, nodes, setTestOutput, testOutput } = useWorkflowStore((state) => state);
+	console.log("nodes: ", nodes);
+	const [selectedRun, setSelectedRun] = useState<WorkflowRun | null>(testOutput ? {
+		id: "test",
+		nodes: nodes,
+		userId: "test",
+		datetime: new Date().toLocaleString()
+	} as WorkflowRun : null);
 
-	const { mutate: update, isLoading: isLoading } = useSWR(deployed ? `deployed/workflow` : null, async () => {
+	useEffect(() => {
+		if (testOutput) {
+			setSelectedRun({
+				id: "test",
+				nodes: nodes,
+				userId: "test",
+				datetime: new Date().toLocaleString()
+			} as WorkflowRun)
+		}
+	}, [testOutput, nodes])
+
+	const { mutate: update, isLoading: isLoading } = useSWR(`deployed/workflow`, async () => {
 		console.log("refreshing data");
 		const req = await fetch(
 			`${window.document.location.origin}/api/workflow/deploy`,
@@ -53,11 +70,11 @@ export const RunSidebar = () => {
 							Loading...
 						</div>
 					</>
-				) : (!selectedRun ? (
+				) : (!selectedRun && !testOutput ? (
 					<>
 						<div className="w-full flex justify-between items-center">
 							<h1 className="font-semibold ">
-								Run History
+								Deployed Runs
 							</h1>
 							<Button variant={"outline"} size={"sm"}
 								onClick={() => update()}>
@@ -72,6 +89,7 @@ export const RunSidebar = () => {
 								py-2 cursor-pointer hover:bg-input/50 rounded-sm px-2
 								text-sm"
 										onClick={() => {
+											setTestOutput(false);
 											setSelectedRun(runHistory[runKey])
 										}}>
 										<div className="flex items-center gap-1">
@@ -93,23 +111,42 @@ export const RunSidebar = () => {
 								</div>
 
 							)}
+
+						<h1 className="font-semibold mt-4">
+							Test Run
+						</h1>
+						{nodes && <div className="flex items-center justify-between border-b 
+								py-2 cursor-pointer hover:bg-input/50 rounded-sm px-2
+								text-sm"
+							onClick={() => {
+								setSelectedRun({
+									id: "test",
+									nodes: nodes,
+									userId: "test",
+									datetime: new Date().toLocaleString()
+								} as WorkflowRun);
+							}}>
+							<div className="flex items-center gap-1">
+								{nodes.map((node) => {
+									if (node.data.icon) {
+										return <img src={node.data.icon}
+											className="w-3 h-3"
+											key={node.id} />
+									}
+								})}
+							</div>
+							<div>
+								test outputs
+							</div>
+						</div>}
 					</>
 				) : (
-					<>
-						<div className="flex justify-between items-center">
-							<Button variant={"outline"} size={"sm"}
-								className="w-fit"
-								onClick={() => setSelectedRun(null)}>
-								<CircleChevronLeft size={12} />
-								Back
-							</Button>
-							<h1 className="font-semibold">
-								{new Date(selectedRun.datetime).toLocaleString()}
-							</h1>
-						</div>
-						<TestSidebar title=""
-							nodes={selectedRun.nodes} />
-					</>
+					<TestSidebar title={new Date(selectedRun?.datetime ?? new Date()).toLocaleString()}
+						nodes={selectedRun?.nodes ?? []}
+						back={() => {
+							setTestOutput(false);
+							setSelectedRun(null);
+						}} />
 				))
 				}
 			</div>

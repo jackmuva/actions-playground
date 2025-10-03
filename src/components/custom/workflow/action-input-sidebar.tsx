@@ -13,7 +13,8 @@ export default function ActionInputSidebar() {
 		paragonToken,
 		nodes,
 		setNodes,
-		setOutputSidebar,
+		setTestOutput,
+		setRunSidebar,
 	} = useWorkflowStore((state) => state);
 
 	const setSelectedNodeInputValues = (inputValues: Record<string, ConnectInputValue>) => {
@@ -38,7 +39,8 @@ export default function ActionInputSidebar() {
 			}
 		}
 		setNodes(newNodes);
-		setOutputSidebar(true);
+		setTestOutput(true);
+		setRunSidebar(true);
 	};
 
 	//TODO:add loading state

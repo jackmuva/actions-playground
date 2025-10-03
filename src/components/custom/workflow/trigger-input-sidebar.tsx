@@ -8,7 +8,13 @@ import useSWR from "swr";
 export const SLACK_ICON = "https://cdn.useparagon.com/latest/dashboard/public/integrations/slack.svg";
 
 export default function TriggerInputSidebar() {
-	const { paragonToken } = useWorkflowStore((state) => state);
+	const { nodes,
+		selectedNode,
+		paragonToken,
+		setTestOutput,
+		setNodes,
+		setSelectedNode,
+		setRunSidebar } = useWorkflowStore((state) => state);
 	const { paragonConnect } = useParagon(paragonToken ?? "");
 
 	const { data: user, isLoading: userIsLoading } = useSWR(`user`, async () => {
@@ -24,10 +30,6 @@ export default function TriggerInputSidebar() {
 		return data;
 	});
 
-
-	console.log('integrations: ', user);
-	const { nodes, selectedNode, setOutputSidebar, setNodes, setSelectedNode } = useWorkflowStore((state) => state);
-
 	const setSelectedNodeData = (data: string) => {
 		if (!selectedNode) return;
 		const newNodes = nodes;
@@ -38,7 +40,8 @@ export default function TriggerInputSidebar() {
 			}
 		}
 		setNodes(newNodes);
-		setOutputSidebar(true);
+		setTestOutput(true);
+		setRunSidebar(true);
 	};
 
 	const updateTrigger = (name: string) => {

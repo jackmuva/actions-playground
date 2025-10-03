@@ -1,28 +1,33 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { useWorkflowStore, WorkflowNode } from "@/store/workflowStore";
-import { Box, CircleChevronRight, ClipboardCopy, Waypoints } from "lucide-react";
-import { OutputTile } from "./output-tile";
+import { Box, Logs, Waypoints } from "lucide-react";
 import { formatInputs } from "@/components/feature/action-tester";
 import { SLACK_APP_MENTION_TEST_PAYLOAD } from "./trigger-input-sidebar";
-import useSWR from "swr";
-import { Workflow } from "@/db/schema";
-import { DeployedMenu } from "./deployed-menu";
-import { TestSidebar } from "./test-sidebar";
 import { RunSidebar } from "./run-sidebar";
+import { useState } from "react";
+
+enum DeployState {
+	PENDING = "Pending",
+	FAILED = "Failed",
+	SUCCESS = "Deployed",
+	NORMAL = "Deploy",
+	REDEPLOY = "Re-deploy",
+};
 
 export const OutputSidebar = () => {
 	const {
-		outputSidebar,
-		setOutputSidebar,
 		setNodes,
 		nodes,
 		edges,
 		paragonToken,
 		deployed,
 		setDeployed,
+		setRunSidebar,
 		runSidebar,
+		setTestOutput,
 	} = useWorkflowStore((state) => state);
+	const [deployState, setDeployState] = useState<DeployState>(deployed ? DeployState.REDEPLOY : DeployState.NORMAL);
 
 	const setSelectedNodeOutput = (selectedNode: WorkflowNode, data: string) => {
 		const newNodes = nodes;
@@ -33,10 +38,11 @@ export const OutputSidebar = () => {
 			}
 		}
 		setNodes(newNodes);
-		setOutputSidebar(true);
+		setRunSidebar(true);
 	};
 
 	const deployWf = async () => {
+		setDeployState(DeployState.PENDING);
 		const res = await fetch(
 			`${window.document.location.origin}/api/workflow/deploy`,
 			{
@@ -47,11 +53,21 @@ export const OutputSidebar = () => {
 				}),
 			}
 		);
-		if (res.ok) {
-			setDeployed(true);
-		} else {
+		if (!res.ok) {
+			setDeployed(false);
+			setDeployState(DeployState.FAILED);
 			throw Error(await res.json());
+		} else {
+			setDeployed(true);
+			setDeployState(DeployState.SUCCESS);
 		}
+		setTimeout(() => {
+			if (!deployed) {
+				setDeployState(DeployState.NORMAL);
+			} else {
+				setDeployState(DeployState.REDEPLOY);
+			}
+		}, 5000);
 	}
 
 	//TODO:Loading state when workflow is being run
@@ -104,11 +120,13 @@ export const OutputSidebar = () => {
 				}
 			}
 		}
+		setTestOutput(true);
+		setRunSidebar(true);
 	}
 
 	return (
-		<div className="w-fit h-full overflow-y-auto absolute top-24 right-0 px-2
-			flex flex-col items-end">
+		<div className="w-fit h-fit overflow-y-auto absolute top-24 right-0 px-2
+			flex flex-col items-end bg-background rounded-sm">
 			<div className="flex gap-2 mb-2 pt-2">
 				<Button size={"sm"} variant={"outline"}
 					onClick={() => testWorkflow()}
@@ -116,21 +134,24 @@ export const OutputSidebar = () => {
 					<Waypoints size={12} />
 					Test Workflow
 				</Button>
-				{deployed ? (
-					<DeployedMenu />
-				) : (<Button size={"sm"} variant={"outline"}
+				<Button size={"sm"} variant={"outline"}
 					onClick={() => deployWf()}
-					disabled={nodes[0].data.trigger ? false : true}>
+					disabled={(nodes[0].data.trigger && (deployState !== DeployState.PENDING && deployState !== DeployState.SUCCESS && deployState !== DeployState.FAILED)) ? false : true}
+					className={`${deployState === DeployState.PENDING ? "animate-pulse" :
+						deployState === DeployState.FAILED ? "bg-red-400/30" :
+							deployState === DeployState.SUCCESS ? "bg-green-400/30" : ""}`}
+
+				>
 					<Box size={12} />
-					Deploy
-				</Button>)}
+					{deployState}
+
+				</Button>
 				<Button variant={"outline"} size={"sm"}
-					onClick={() => setOutputSidebar(!outputSidebar)} >
-					{outputSidebar ? <CircleChevronRight size={20} /> : <ClipboardCopy size={20} />}
-					{outputSidebar ? "Collapse" : "Output"}
+					onClick={() => setRunSidebar(!runSidebar)} >
+					<Logs size={20} />
+					Workflow Runs
 				</Button>
 			</div>
-			{outputSidebar && <TestSidebar nodes={nodes} title="Test Output" />}
 			{runSidebar && <RunSidebar />}
 		</div>
 	);

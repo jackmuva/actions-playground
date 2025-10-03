@@ -21,8 +21,11 @@ export default function WorkflowSidebar({ session }: { session: { paragonUserTok
 							<Info size={12} />
 						</TooltipTrigger>
 						<TooltipContent>
-							<p className="text-sm text-wrap">
+							<p className="text-sm text-wrap text-center">
 								ActionKit provides nodes and descriptions for popular actions per integration
+								<br />
+								(We do not store or use data from connected sources. <br />
+								This playground is purely used for demonstration purposes)
 							</p>
 						</TooltipContent>
 					</Tooltip>

@@ -54,8 +54,8 @@ type WorkflowState = {
 	setNodes: (nodes: WorkflowNode[]) => void;
 	setEdges: (edges: Edge[]) => void;
 	setSelectedNode: (nodeId: string | null) => void;
-	outputSidebar: boolean;
-	setOutputSidebar: (open: boolean) => void;
+	testOutput: boolean;
+	setTestOutput: (open: boolean) => void;
 	paragonToken: string | null;
 	setParagonToken: (token: string | null) => void;
 	deployed: boolean;
@@ -82,7 +82,7 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
 	}],
 	edges: [],
 	selectedNodeId: null,
-	outputSidebar: false,
+	testOutput: false,
 	paragonToken: null,
 	deployed: false,
 	runSidebar: false,
@@ -122,11 +122,8 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
 		set({ selectedNode: node });
 	},
 
-	setOutputSidebar: (isOpen: boolean) => {
-		if (isOpen) {
-			set({ runSidebar: false });
-		}
-		set({ outputSidebar: isOpen })
+	setTestOutput: (isTest: boolean) => {
+		set({ testOutput: isTest })
 	},
 
 	setParagonToken: (token: string | null) => set({ paragonToken: token }),
@@ -134,9 +131,6 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
 	setDeployed: (deploy: boolean) => set({ deployed: deploy }),
 
 	setRunSidebar: (open: boolean) => {
-		if (open) {
-			set({ outputSidebar: false });
-		}
 		set({ runSidebar: open });
 	},
 

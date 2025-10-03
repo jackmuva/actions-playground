@@ -53,11 +53,6 @@ const performAction = async (node: WorkflowNode, userId: string): Promise<string
 }
 
 export const runWorkflow = async (nodes: WorkflowNode[], edges: Edge[], userId: string, triggerInput: string): Promise<WorkflowNode[]> => {
-	// console.log('nodes: ', nodes);
-	// console.log('edges: ', edges);
-	// console.log('userId: ', userId);
-	// console.log('triggerinput: ', triggerInput);
-
 	let newNodes: WorkflowNode[] = [...nodes];
 	const edgeMap: Map<string, Array<string>> = new Map();
 	const nodeMap: Map<string, WorkflowNode> = new Map();

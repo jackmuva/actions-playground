@@ -48,8 +48,11 @@ export default function ActionsSidebar({ session }: { session: { paragonUserToke
 							<Info size={12} />
 						</TooltipTrigger>
 						<TooltipContent>
-							<p className="text-sm text-wrap">
+							<p className="text-sm text-wrap text-center">
 								Paragon fully manages integration auth for your end-users.
+								<br />
+								(We do not store or use data from connected sources. <br />
+								This playground is purely used for demonstration purposes)
 							</p>
 						</TooltipContent>
 					</Tooltip>
