@@ -32,7 +32,6 @@ export type ActionNodeType = Node<{
 	trigger?: ParagonTrigger;
 }, 'actionNode'>
 
-//TODO:Make Trigger Node type an Action Node type
 export type TriggerNodeType = Node<{
 	trigger: ParagonTrigger | null,
 	inputValues: Record<string, ConnectInputValue>;
@@ -88,7 +87,6 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
 	runSidebar: false,
 	runHistory: {},
 
-	//TODO:fix typing on this
 	//@ts-expect-error not sure why yet
 	onNodesChange: (changes: NodeChange<WorkflowNode>[]) => {
 		set({
