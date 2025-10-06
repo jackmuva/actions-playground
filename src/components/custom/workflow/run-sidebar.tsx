@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import useSWR from "swr";
 import { TestSidebar } from "./test-sidebar";
 import { Button } from "@/components/ui/button";
-import { CircleChevronLeft, RotateCw, TestTubeDiagonal } from "lucide-react";
+import { RotateCw } from "lucide-react";
 
 export const RunSidebar = () => {
 	const { runHistory, setRunHistory, nodes, setTestOutput, testOutput } = useWorkflowStore((state) => state);

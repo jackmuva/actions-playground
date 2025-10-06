@@ -1,4 +1,4 @@
-import { useWorkflowStore, WorkflowNode } from "@/store/workflowStore";
+import { WorkflowNode } from "@/store/workflowStore";
 import { OutputTile } from "./output-tile";
 import { Button } from "@/components/ui/button";
 import { CircleChevronLeft } from "lucide-react";
@@ -12,7 +12,6 @@ export const TestSidebar = ({
 	nodes: WorkflowNode[],
 	back: () => void,
 }) => {
-	console.log("test nodes: ", nodes);
 	return (
 		<div className="w-96 max-h-full overflow-y-auto flex flex-col relative">
 			<div className="flex justify-between items-center">

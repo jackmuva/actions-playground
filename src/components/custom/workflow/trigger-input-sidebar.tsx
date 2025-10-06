@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button"
 import useParagon from "@/lib/hooks";
 import { useWorkflowStore, WorkflowNode } from "@/store/workflowStore";
-import { ConnectUser } from "@useparagon/connect";
 import { CircleChevronLeft, CirclePlus, TestTubeDiagonal } from "lucide-react"
 import useSWR from "swr";
 
@@ -17,7 +16,7 @@ export default function TriggerInputSidebar() {
 		setRunSidebar } = useWorkflowStore((state) => state);
 	const { paragonConnect } = useParagon(paragonToken ?? "");
 
-	const { data: user, isLoading: userIsLoading } = useSWR(`user`, async () => {
+	const { data: user } = useSWR(`user`, async () => {
 		const response = await fetch(
 			`https://api.useparagon.com/projects/${process.env.NEXT_PUBLIC_PARAGON_PROJECT_ID}/sdk/me`,
 			{

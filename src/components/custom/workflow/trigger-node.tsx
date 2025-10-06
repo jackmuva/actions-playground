@@ -1,4 +1,4 @@
-import { Plug, Zap } from "lucide-react";
+import { Zap } from "lucide-react";
 import { Handle, NodeProps, Position } from "@xyflow/react";
 import { TriggerNodeType, useWorkflowStore } from "@/store/workflowStore";
 
