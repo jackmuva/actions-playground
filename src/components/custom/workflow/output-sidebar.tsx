@@ -17,9 +17,9 @@ enum DeployState {
 };
 
 export enum RunState {
-	SUCCESS = "Success",
+	SUCCESS = "Finished",
 	LOADING = "Loading",
-	NORMAL = "Run Workflow",
+	NORMAL = "Test Workflow",
 }
 
 export const OutputSidebar = () => {
