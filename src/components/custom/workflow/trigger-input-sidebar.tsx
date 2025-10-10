@@ -3,6 +3,8 @@ import useParagon from "@/lib/hooks";
 import { useWorkflowStore, WorkflowNode } from "@/store/workflowStore";
 import { CircleChevronLeft, CirclePlus, TestTubeDiagonal } from "lucide-react"
 import useSWR from "swr";
+import { RunState } from "./output-sidebar";
+import { useState } from "react";
 
 export const SLACK_ICON = "https://cdn.useparagon.com/latest/dashboard/public/integrations/slack.svg";
 
@@ -15,6 +17,7 @@ export default function TriggerInputSidebar() {
 		setSelectedNode,
 		setRunSidebar } = useWorkflowStore((state) => state);
 	const { paragonConnect } = useParagon(paragonToken ?? "");
+	const [runState, setRunState] = useState<RunState>(RunState.NORMAL);
 
 	const { data: user } = useSWR(`user`, async () => {
 		const response = await fetch(
@@ -30,6 +33,7 @@ export default function TriggerInputSidebar() {
 	});
 
 	const setSelectedNodeData = (data: string) => {
+		setRunState(RunState.LOADING);
 		if (!selectedNode) return;
 		const newNodes = nodes;
 
@@ -41,6 +45,10 @@ export default function TriggerInputSidebar() {
 		setNodes(newNodes);
 		setTestOutput(true);
 		setRunSidebar(true);
+		setRunState(RunState.SUCCESS);
+		setTimeout(() => {
+			setRunState(RunState.NORMAL);
+		}, 5000);
 	};
 
 	const updateTrigger = (name: string) => {
@@ -67,7 +75,6 @@ export default function TriggerInputSidebar() {
 		<div className="w-full flex flex-col gap-4">
 			<div className="w-full flex justify-between items-center">
 				<Button variant={"outline"} size={"sm"}
-					className="w-fit"
 					onClick={() => setSelectedNode(null)}>
 					<CircleChevronLeft size={12} />
 					Back
@@ -76,10 +83,12 @@ export default function TriggerInputSidebar() {
 						when more triggers are implemented */}
 				{selectedNode && selectedNode.data.trigger &&
 					<Button variant={"outline"} size={"sm"}
-						className="w-fit "
+						disabled={runState === RunState.NORMAL ? false : true}
+						className={`${runState === RunState.LOADING ? "animate-pulse" :
+							runState === RunState.SUCCESS ? "bg-green-400/30" : ""}`}
 						onClick={() => setSelectedNodeData(SLACK_APP_MENTION_TEST_PAYLOAD)}>
 						<TestTubeDiagonal size={12} />
-						Test Step
+						{runState === RunState.NORMAL ? "Test Step" : runState}
 					</Button>
 				}
 			</div>

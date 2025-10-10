@@ -1,11 +1,12 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { useWorkflowStore, WorkflowNode } from "@/store/workflowStore";
-import { Box, Logs, Waypoints } from "lucide-react";
+import { Box, Info, Logs, Waypoints } from "lucide-react";
 import { formatInputs } from "@/components/feature/action-tester";
 import { SLACK_APP_MENTION_TEST_PAYLOAD } from "./trigger-input-sidebar";
 import { RunSidebar } from "./run-sidebar";
 import { useState } from "react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 enum DeployState {
 	PENDING = "Pending",
@@ -14,6 +15,12 @@ enum DeployState {
 	NORMAL = "Deploy",
 	REDEPLOY = "Re-deploy",
 };
+
+export enum RunState {
+	SUCCESS = "Success",
+	LOADING = "Loading",
+	NORMAL = "Run Workflow",
+}
 
 export const OutputSidebar = () => {
 	const {
@@ -28,6 +35,7 @@ export const OutputSidebar = () => {
 		setTestOutput,
 	} = useWorkflowStore((state) => state);
 	const [deployState, setDeployState] = useState<DeployState>(deployed ? DeployState.REDEPLOY : DeployState.NORMAL);
+	const [runState, setRunState] = useState<RunState>(RunState.NORMAL);
 
 	const setSelectedNodeOutput = (selectedNode: WorkflowNode, data: string) => {
 		const newNodes = nodes;
@@ -94,6 +102,7 @@ export const OutputSidebar = () => {
 	}
 
 	const testWorkflow = async () => {
+		setRunState(RunState.LOADING);
 		const edgeMap: Map<string, Array<string>> = new Map();
 		const nodeMap: Map<string, WorkflowNode> = new Map();
 		const queue: Array<string> = [];
@@ -122,17 +131,43 @@ export const OutputSidebar = () => {
 		}
 		setTestOutput(true);
 		setRunSidebar(true);
+		setRunState(RunState.SUCCESS);
+		setTimeout(() => {
+			setRunState(RunState.NORMAL);
+		}, 5000);
+
 	}
 
 	return (
 		<div className="w-fit h-fit overflow-y-auto absolute top-24 right-0 px-2
 			flex flex-col items-end bg-background rounded-sm">
 			<div className="flex gap-2 mb-2 pt-2">
+				<Tooltip>
+					<TooltipTrigger>
+						<Info size={12} />
+					</TooltipTrigger>
+					<TooltipContent>
+						<p className="text-sm text-wrap text-center">
+							<strong>Test Workflow</strong> to run the entire workflow using test trigger data and data from your inputs.
+							<br />
+							<br />
+							<strong>Deploy</strong> your workflow to see your workflow run live based off your trigger.
+							<br />
+							i.e. For the App Mention Trigger, mention @Actions_Playground in a public channel in your connected Slack workspace.
+							<br />
+							<br />
+							Test and deployed workflow runs are both found in <strong>Workflow Runs</strong>.
+						</p>
+					</TooltipContent>
+				</Tooltip>
 				<Button size={"sm"} variant={"outline"}
 					onClick={() => testWorkflow()}
-					disabled={nodes[0].data.trigger ? false : true}>
+					disabled={(nodes[0].data.trigger && runState === RunState.NORMAL) ? false : true}
+					className={`${runState === RunState.LOADING ? "animate-pulse" :
+						runState === RunState.SUCCESS ? "bg-green-400/30" : ""}`}
+				>
 					<Waypoints size={12} />
-					Test Workflow
+					{runState}
 				</Button>
 				<Button size={"sm"} variant={"outline"}
 					onClick={() => deployWf()}
@@ -144,7 +179,6 @@ export const OutputSidebar = () => {
 				>
 					<Box size={12} />
 					{deployState}
-
 				</Button>
 				<Button variant={"outline"} size={"sm"}
 					onClick={() => setRunSidebar(!runSidebar)} >

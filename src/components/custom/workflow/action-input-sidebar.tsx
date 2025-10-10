@@ -5,6 +5,8 @@ import { useWorkflowStore } from "@/store/workflowStore";
 import { ConnectInputValue, SerializedConnectInput } from "@useparagon/connect";
 import { CircleChevronLeft, TestTubeDiagonal } from "lucide-react";
 import useSWR from "swr";
+import { RunState } from "./output-sidebar";
+import { useState } from "react";
 
 export default function ActionInputSidebar() {
 	const {
@@ -16,6 +18,7 @@ export default function ActionInputSidebar() {
 		setTestOutput,
 		setRunSidebar,
 	} = useWorkflowStore((state) => state);
+	const [runState, setRunState] = useState<RunState>(RunState.NORMAL);
 
 	const setSelectedNodeInputValues = (inputValues: Record<string, ConnectInputValue>) => {
 		if (!selectedNode) return;
@@ -43,8 +46,8 @@ export default function ActionInputSidebar() {
 		setRunSidebar(true);
 	};
 
-	//TODO:add loading state
 	const { mutate: actionMutate } = useSWR(`run/action/${selectedNode?.id}`, async () => {
+		setRunState(RunState.LOADING);
 		if (!selectedNode) return;
 		const response = await fetch(
 			`https://actionkit.useparagon.com/projects/${process.env.NEXT_PUBLIC_PARAGON_PROJECT_ID}/actions`,
@@ -62,6 +65,10 @@ export default function ActionInputSidebar() {
 		);
 		const data = await response.json();
 		setSelectedNodeOutput(JSON.stringify(data, null, 2));
+		setRunState(RunState.SUCCESS);
+		setTimeout(() => {
+			setRunState(RunState.NORMAL);
+		}, 5000);
 	},
 		{
 			revalidateOnMount: false,
@@ -73,16 +80,17 @@ export default function ActionInputSidebar() {
 		<div className="w-full flex flex-col gap-4">
 			<div className="w-full flex justify-between">
 				<Button variant={"outline"} size={"sm"}
-					className="w-fit"
 					onClick={() => setSelectedNode(null)}>
 					<CircleChevronLeft size={12} />
 					Back
 				</Button>
 				<Button variant={"outline"} size={"sm"}
-					className="w-fit"
+					disabled={runState === RunState.NORMAL ? false : true}
+					className={`${runState === RunState.LOADING ? "animate-pulse" :
+						runState === RunState.SUCCESS ? "bg-green-400/30" : ""}`}
 					onClick={() => actionMutate(undefined, { revalidate: true })}>
 					<TestTubeDiagonal size={12} />
-					Test Step
+					{runState === RunState.NORMAL ? "Test Step" : runState}
 				</Button>
 
 			</div>
