@@ -153,7 +153,8 @@ export const OutputSidebar = () => {
 							<br />
 							<strong>Deploy</strong> your workflow to see your workflow run live based off your trigger.
 							<br />
-							i.e. For the App Mention Trigger, mention @Actions_Playground in a public channel in your connected Slack workspace.
+							(i.e. For the App Mention Trigger, mention @Actions_Playground in a <br />
+							public channel in your connected Slack workspace)
 							<br />
 							<br />
 							Test and deployed workflow runs are both found in <strong>Workflow Runs</strong>.
