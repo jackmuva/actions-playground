@@ -1,7 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { useWorkflowStore, WorkflowNode } from "@/store/workflowStore";
-import { Box, Info, Logs, Waypoints } from "lucide-react";
+import { Box, CircleChevronRight, Logs, Waypoints } from "lucide-react";
 import { formatInputs } from "@/components/feature/action-tester";
 import { SLACK_APP_MENTION_TEST_PAYLOAD } from "./trigger-input-sidebar";
 import { RunSidebar } from "./run-sidebar";
@@ -183,7 +183,7 @@ export const OutputSidebar = () => {
 					<TooltipTrigger asChild>
 						<Button variant={"outline"} size={"sm"}
 							onClick={() => setRunSidebar(!runSidebar)} >
-							<Logs size={20} />
+							{runSidebar ? <CircleChevronRight size={12} /> : <Logs size={20} />}
 							Workflow Runs
 						</Button>
 					</TooltipTrigger>

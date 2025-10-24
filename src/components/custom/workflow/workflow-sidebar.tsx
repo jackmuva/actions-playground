@@ -9,6 +9,7 @@ import TriggerInputSidebar from "./trigger-input-sidebar";
 export default function WorkflowSidebar({ session }: { session: { paragonUserToken?: string } }) {
 	const selectedNode = useWorkflowStore((state) => state.selectedNode);
 
+	console.log('selected: ', selectedNode);
 	return (
 		<div className="w-[500px] max-h-full overflow-y-auto">
 			<div className="flex justify-between items-center mb-4">
@@ -34,7 +35,7 @@ export default function WorkflowSidebar({ session }: { session: { paragonUserTok
 			{!selectedNode ? <OptionsSidebar session={session} /> :
 				selectedNode.id === 'trigger' ? <TriggerInputSidebar /> :
 					<ActionInputSidebar />}
-			{selectedNode && selectedNode.id !== 'trigger' &&
+			{(!selectedNode || selectedNode.id !== 'trigger') &&
 				<p className="mt-4 text-sm text-neutral-500 text-wrap text-center">
 					Visit&nbsp;
 					<a href="https://docs.useparagon.com/actionkit/overview"
