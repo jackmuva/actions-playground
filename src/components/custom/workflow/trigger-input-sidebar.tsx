@@ -112,6 +112,20 @@ export default function TriggerInputSidebar() {
 					<CirclePlus size={15} />Trigger
 				</Button>
 			</div>
+			<p className="mt-4 text-sm text-neutral-500 text-wrap text-center">
+				We loaded just one of our triggers for demonstration purposes
+				(more to come!).<br /><br />
+				Visit&nbsp;
+				<a href="https://docs.useparagon.com/actionkit/overview"
+					target="_blank"
+					className="text-indigo-700 hover:text-indigo-500 font-semibold">
+					our webhook docs
+				</a>
+				&nbsp;to see how you can use custom webhooks along
+				with our pre-built integration-specific webhooks like
+				the <em>Slack App Mention</em> above.
+			</p>
+
 		</div >
 	);
 }

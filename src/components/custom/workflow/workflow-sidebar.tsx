@@ -34,15 +34,16 @@ export default function WorkflowSidebar({ session }: { session: { paragonUserTok
 			{!selectedNode ? <OptionsSidebar session={session} /> :
 				selectedNode.id === 'trigger' ? <TriggerInputSidebar /> :
 					<ActionInputSidebar />}
-			<p className="mt-4 text-sm text-neutral-500 text-wrap text-center">
-				Visit&nbsp;
-				<a href="https://docs.useparagon.com/actionkit/overview"
-					target="_blank"
-					className="text-indigo-700 hover:text-indigo-500 font-semibold">
-					our docs
-				</a>
-				&nbsp;for our full list of supported Actions for Workflow Builders
-			</p>
+			{selectedNode && selectedNode.id !== 'trigger' &&
+				<p className="mt-4 text-sm text-neutral-500 text-wrap text-center">
+					Visit&nbsp;
+					<a href="https://docs.useparagon.com/actionkit/overview"
+						target="_blank"
+						className="text-indigo-700 hover:text-indigo-500 font-semibold">
+						our docs
+					</a>
+					&nbsp;for our full list of supported Actions for Workflow Builders
+				</p>}
 		</div>
 	);
 }

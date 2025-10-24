@@ -43,7 +43,7 @@ export function TriggerNode({ id, data }: NodeProps<TriggerNodeType>) {
 						</p>
 					</div>
 					<div className="flex gap-1 text-center items-center 
-							text-indigo-700 font-semibold">
+							text-indigo-700 font-semibold hover:text-indigo-500">
 						<CirclePlus size={15} />
 						Add a trigger and get started
 					</div>
