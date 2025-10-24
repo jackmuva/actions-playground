@@ -8,7 +8,6 @@ import { RotateCw } from "lucide-react";
 
 export const RunSidebar = () => {
 	const { runHistory, setRunHistory, nodes, setTestOutput, testOutput } = useWorkflowStore((state) => state);
-	console.log("nodes: ", nodes);
 	const [selectedRun, setSelectedRun] = useState<WorkflowRun | null>(testOutput ? {
 		id: "test",
 		nodes: nodes,
@@ -40,13 +39,11 @@ export const RunSidebar = () => {
 		);
 		const res: { status: number, data: WorkflowRun[] } = await req.json();
 		if (!req.ok) throw Error(res.data.toString());
-		console.log("data: ", res);
 		setRunHistory(res.data);
 	},
 		{
 			revalidateOnFocus: false,
 			revalidateOnMount: true,
-			// refreshInterval: 10000,
 		}
 	);
 
@@ -146,7 +143,8 @@ export const RunSidebar = () => {
 						back={() => {
 							setTestOutput(false);
 							setSelectedRun(null);
-						}} />
+						}}
+					/>
 				))
 				}
 			</div>

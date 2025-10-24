@@ -55,6 +55,7 @@ type WorkflowState = {
 	setSelectedNode: (nodeId: string | null) => void;
 	testOutput: boolean;
 	setTestOutput: (open: boolean) => void;
+	retrigger: number;
 	paragonToken: string | null;
 	setParagonToken: (token: string | null) => void;
 	deployed: boolean;
@@ -86,6 +87,7 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
 	deployed: false,
 	runSidebar: false,
 	runHistory: {},
+	retrigger: 0,
 
 	//@ts-expect-error not sure why yet
 	onNodesChange: (changes: NodeChange<WorkflowNode>[]) => {
@@ -121,7 +123,8 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
 	},
 
 	setTestOutput: (isTest: boolean) => {
-		set({ testOutput: isTest })
+		set({ testOutput: isTest });
+		set({ retrigger: get().retrigger + 1 });
 	},
 
 	setParagonToken: (token: string | null) => set({ paragonToken: token }),
