@@ -143,49 +143,54 @@ export const OutputSidebar = () => {
 			flex flex-col items-end bg-background rounded-sm">
 			<div className="flex gap-2 mb-2 pt-2">
 				<Tooltip>
-					<TooltipTrigger>
-						<Info size={12} />
+					<TooltipTrigger asChild>
+						<Button size={"sm"} variant={"outline"}
+							onClick={() => testWorkflow()}
+							disabled={(nodes[0].data.trigger && runState === RunState.NORMAL) ? false : true}
+							className={`${runState === RunState.LOADING ? "animate-pulse" :
+								runState === RunState.SUCCESS ? "bg-green-400/30" : ""}`}
+						>
+							<Waypoints size={12} />
+							{runState}
+						</Button>
 					</TooltipTrigger>
 					<TooltipContent>
-						<p className="text-sm text-wrap text-center">
-							<strong>Test Workflow</strong> to run the entire workflow using test trigger data and data from your inputs.
-							<br />
-							<br />
-							<strong>Deploy</strong> your workflow to see your workflow run live based off your trigger.
-							<br />
-							(i.e. For the App Mention Trigger, mention @Actions_Playground in a <br />
-							public channel in your connected Slack workspace)
-							<br />
-							<br />
-							Test and deployed workflow runs are both found in <strong>Workflow Runs</strong>.
-						</p>
+						<strong>Test Workflow</strong> to run the entire workflow using test trigger data and data from your inputs.
 					</TooltipContent>
 				</Tooltip>
-				<Button size={"sm"} variant={"outline"}
-					onClick={() => testWorkflow()}
-					disabled={(nodes[0].data.trigger && runState === RunState.NORMAL) ? false : true}
-					className={`${runState === RunState.LOADING ? "animate-pulse" :
-						runState === RunState.SUCCESS ? "bg-green-400/30" : ""}`}
-				>
-					<Waypoints size={12} />
-					{runState}
-				</Button>
-				<Button size={"sm"} variant={"outline"}
-					onClick={() => deployWf()}
-					disabled={(nodes[0].data.trigger && (deployState !== DeployState.PENDING && deployState !== DeployState.SUCCESS && deployState !== DeployState.FAILED)) ? false : true}
-					className={`${deployState === DeployState.PENDING ? "animate-pulse" :
-						deployState === DeployState.FAILED ? "bg-red-400/30" :
-							deployState === DeployState.SUCCESS ? "bg-green-400/30" : ""}`}
+				<Tooltip>
+					<TooltipTrigger asChild>
+						<Button size={"sm"} variant={"outline"}
+							onClick={() => deployWf()}
+							disabled={(nodes[0].data.trigger && (deployState !== DeployState.PENDING && deployState !== DeployState.SUCCESS && deployState !== DeployState.FAILED)) ? false : true}
+							className={`${deployState === DeployState.PENDING ? "animate-pulse" :
+								deployState === DeployState.FAILED ? "bg-red-400/30" :
+									deployState === DeployState.SUCCESS ? "bg-green-400/30" : ""}`}
 
-				>
-					<Box size={12} />
-					{deployState}
-				</Button>
-				<Button variant={"outline"} size={"sm"}
-					onClick={() => setRunSidebar(!runSidebar)} >
-					<Logs size={20} />
-					Workflow Runs
-				</Button>
+						>
+							<Box size={12} />
+							{deployState}
+						</Button>
+					</TooltipTrigger>
+					<TooltipContent>
+						<strong>Deploy</strong> your workflow to see your workflow run live based off your trigger.
+						<br /><br />
+						(i.e. For the App Mention Trigger, mention @Actions_Playground in a <br />
+						public channel in your connected Slack workspace)
+					</TooltipContent>
+				</Tooltip>
+				<Tooltip>
+					<TooltipTrigger asChild>
+						<Button variant={"outline"} size={"sm"}
+							onClick={() => setRunSidebar(!runSidebar)} >
+							<Logs size={20} />
+							Workflow Runs
+						</Button>
+					</TooltipTrigger>
+					<TooltipContent>
+						Test and deployed workflow runs are both found in <strong>Workflow Runs</strong>.
+					</TooltipContent>
+				</Tooltip>
 			</div>
 			{runSidebar && <RunSidebar />}
 		</div>
