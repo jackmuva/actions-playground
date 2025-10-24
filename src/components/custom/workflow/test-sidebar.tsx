@@ -16,15 +16,13 @@ export const TestSidebar = ({
 	const { testOutput, retrigger } = useWorkflowStore((state) => state);
 	const [load, setLoad] = useState(false);
 
-	console.log(retrigger);
-
 	useEffect(() => {
 		if (!testOutput) return;
 		setLoad(true);
 		setTimeout(() => {
 			setLoad(false);
 		}, 1000)
-	}, [retrigger])
+	}, [retrigger, testOutput])
 
 	return (
 		<div className="w-96 max-h-full overflow-y-auto flex flex-col relative">

@@ -92,6 +92,7 @@ export const RunSidebar = () => {
 										<div className="flex items-center gap-1">
 											{runHistory[runKey].nodes.map((node) => {
 												return <img src={node.data.icon}
+													alt="icon"
 													className="w-3 h-3"
 													key={node.id} />
 											})}
@@ -127,6 +128,7 @@ export const RunSidebar = () => {
 								{nodes.map((node) => {
 									if (node.data.icon) {
 										return <img src={node.data.icon}
+											alt="icon"
 											className="w-3 h-3"
 											key={node.id} />
 									}

@@ -14,7 +14,7 @@ import inputsMapping from '@/lib/inputsMapping.json';
 import useParagon from '@/lib/hooks';
 import useSWR from 'swr'
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
 
 const IntegrationTitle = ({ integration }: { integration: string | null }) => {
 	const integrations = paragon.getIntegrationMetadata();
