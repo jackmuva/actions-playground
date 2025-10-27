@@ -1,14 +1,28 @@
 "use client";
-import useParagon from "@/lib/hooks";
 import { Info } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../../ui/tooltip";
 import useSWR from "swr";
 import { ActionsSidebarTile } from "./actions-sidebar-tile";
 import { SidebarLoading } from "../sidebar-loading";
+import useParagon from "@/lib/hooks";
+import { IIntegrationMetadata } from "@useparagon/connect";
 
 export default function ActionsSidebar({ session }: { session: { paragonUserToken?: string } }) {
 	const { paragonConnect } = useParagon(session.paragonUserToken ?? "");
-	const integrations = paragonConnect?.getIntegrationMetadata();
+
+	const { data: integrations } = useSWR<IIntegrationMetadata[]>(`integrations`, async () => {
+		const response = await fetch(
+			`https://api.useparagon.com/projects/${process.env.NEXT_PUBLIC_PARAGON_PROJECT_ID}/sdk/metadata`,
+			{
+				headers: {
+					Authorization: `Bearer ${session.paragonUserToken}`,
+					"Content-type": "application/json",
+				},
+			},
+		);
+		const data = await response.json();
+		return data;
+	});
 
 	const { data: user, isLoading: userIsLoading } = useSWR(`user`, async () => {
 		const response = await fetch(

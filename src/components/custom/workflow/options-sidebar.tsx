@@ -1,7 +1,8 @@
-import useParagon from "@/lib/hooks";
 import useSWR from "swr";
 import { SidebarLoading } from "../sidebar-loading";
 import { WorkflowSidebarTile } from "./workflow-sidebar-tile";
+import useParagon from "@/lib/hooks";
+import { IIntegrationMetadata } from "@useparagon/connect";
 
 export default function OptionsSidebar({
 	session,
@@ -9,7 +10,21 @@ export default function OptionsSidebar({
 	session: { paragonUserToken?: string }
 }) {
 	const { paragonConnect } = useParagon(session.paragonUserToken ?? "");
-	const integrations = paragonConnect?.getIntegrationMetadata();
+
+	const { data: integrations } = useSWR<IIntegrationMetadata[]>(`integrations`, async () => {
+		const response = await fetch(
+			`https://api.useparagon.com/projects/${process.env.NEXT_PUBLIC_PARAGON_PROJECT_ID}/sdk/metadata`,
+			{
+				headers: {
+					Authorization: `Bearer ${session.paragonUserToken}`,
+					"Content-type": "application/json",
+				},
+			},
+		);
+		const data = await response.json();
+		return data;
+	});
+
 
 	const { data: user, isLoading: userIsLoading } = useSWR(`user`, async () => {
 		const response = await fetch(
