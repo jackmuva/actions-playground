@@ -229,7 +229,7 @@ export default function ActionTester({ session }: { session: { paragonUserToken?
 							</p>
 							<p>
 								We selected just a few common integrations. You can check out
-								the full catalog of integrations and actions in &nbsp;
+								the full catalog of integrations and actions in&nbsp;
 								<a href="https://docs.useparagon.com/actionkit/overview"
 									target="_blank"
 									className="text-indigo-700 hover:text-indigo-500 font-semibold">
