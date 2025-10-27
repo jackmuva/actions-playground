@@ -9,7 +9,6 @@ import TriggerInputSidebar from "./trigger-input-sidebar";
 export default function WorkflowSidebar({ session }: { session: { paragonUserToken?: string } }) {
 	const selectedNode = useWorkflowStore((state) => state.selectedNode);
 
-	console.log('selected: ', selectedNode);
 	return (
 		<div className="w-[500px] max-h-full overflow-y-auto">
 			<div className="flex justify-between items-center mb-4">

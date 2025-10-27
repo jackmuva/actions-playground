@@ -35,6 +35,8 @@ export default function ActionsSidebar({ session }: { session: { paragonUserToke
 		const data = await response.json();
 		return data.actions;
 	});
+	console.log(integrations);
+	console.log(user);
 
 	return (
 		<div className="w-96 max-h-full overflow-y-auto">

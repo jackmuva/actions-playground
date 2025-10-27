@@ -176,21 +176,27 @@ export default function ActionTester({ session }: { session: { paragonUserToken?
 	return (
 		<>
 			<Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-				<DialogContent className='max-w-[700px] h-fit'>
+				<DialogContent className='max-w-[700px] max-h-11/12 h-fit  overflow-y-auto'>
 					<DialogHeader>
 						<DialogTitle className='text-lg'>
 							Welcome to the ActionKit Playground
 						</DialogTitle>
 						<div className='flex flex-col space-y-2'>
 							<p>
-								ActionKit is an API that provides 1000+ pre-built actions across
-								integration providers. Each action comes
-								with <strong>LLM & human readable</strong> descriptions
-								and inputs so you can easily plug in these actions
-								as <strong>tools to an agent or inputs in your UI</strong>.
+								This playground lets you explore a handful of Paragon&apos;s 1000+ pre-built actions available in ActionKit.
 							</p>
+							<h2 className='font-bold'>Each action contains:</h2>
+							<div className='markdown'>
+								<ol>
+									<li>What the action does (i.e. Get Calendar Availability)</li>
+									<li>Input fields to run the action</li>
+									<li>Real-time execution when you click &apos;Run&apos;</li>
+								</ol>
+							</div>
+							<h2 className='font-bold'>Under the hood:</h2>
 							<p>
-								<strong>GET Actions</strong> will return a payload like this:
+								Actionkit has 2 API endpoints. The <strong>GET /actions</strong> returns a standardized format with both
+								human and LLM readable descriptions.
 							</p>
 							<pre className="text-xs p-2 bg-neutral-100 rounded-md overflow-x-auto">
 								&#123;<br />
@@ -209,15 +215,19 @@ export default function ActionTester({ session }: { session: { paragonUserToken?
 								&#125;<br />
 							</pre>
 							<p>
-								and the <strong>POST Actions</strong> will execute the action.
+								We use the returned schema to dynamically generate the input forms on this page
 							</p>
 							<p>
-								We used the <strong>GET Actions</strong> payloads to render the inputs and
-								descriptions of each action.
+								When you click <strong>Run</strong>, the action is executed via <strong>POST /actions</strong>.
 							</p>
 							<p>
-								Try executing a few actions with the <strong>POST Actions</strong> across
-								integrations that interest you.
+								(<em>Simple in design, these 2 Actionkit endpoints is all it takes to power use cases like <strong>tools for AI Agents</strong> and <strong>Embedded Workflow Builders</strong>)</em>
+							</p>
+							<h2 className='font-bold'>Try it:</h2>
+							<p>
+								Pick an integration, fill in the inputs, and execute an action. After you get a feel for ActionKit works, explore our use case tabs in the navbar.
+							</p>
+							<p>
 								We selected just a few common integrations. You can check out
 								the full catalog of integrations and actions in &nbsp;
 								<a href="https://docs.useparagon.com/actionkit/overview"
